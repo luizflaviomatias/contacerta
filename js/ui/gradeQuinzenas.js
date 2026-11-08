@@ -29,14 +29,14 @@ export function criarGradeQuinzenas(container, acoes) {
     if (botao.dataset.acao === 'adicionar') acoes.aoAdicionar(botao.dataset.tipo, botao.dataset.quinzena);
   });
 
-  function renderizar({ ano, mes, lancamentos, diaSelecionado }) {
+  function renderizar({ ano, mes, lancamentos }) {
     container.innerHTML = `
       <section class="resumo-mes" aria-label="Resumo do mês">
         ${blocoDeTotal('Recebido no mês', 'mes-recebido')}
         ${blocoDeTotal('Gasto no mês', 'mes-gasto')}
         ${blocoDeTotal('Saldo do mês', 'mes-saldo')}
       </section>
-      ${QUINZENAS.map((definicao) => cartaoDaQuinzena({ ...definicao, ano, mes, lancamentos, diaSelecionado })).join('')}`;
+      ${QUINZENAS.map((definicao) => cartaoDaQuinzena({ ...definicao, ano, mes, lancamentos })).join('')}`;
     atualizarTotais(lancamentos);
   }
 
@@ -88,7 +88,7 @@ function blocoDeTotal(rotulo, chave) {
           <strong class="total__valor" data-total="${chave}"></strong></div>`;
 }
 
-function cartaoDaQuinzena({ quinzena, titulo, ano, mes, lancamentos, diaSelecionado }) {
+function cartaoDaQuinzena({ quinzena, titulo, ano, mes, lancamentos }) {
   const { primeiroDia, ultimoDia } = intervaloDaQuinzena(quinzena, ano, mes);
   const daQuinzena = lancamentosDaQuinzena(lancamentos, quinzena);
   const doTipo = (tipo) => daQuinzena.filter((lancamento) => lancamento.tipo === tipo);
@@ -98,8 +98,8 @@ function cartaoDaQuinzena({ quinzena, titulo, ano, mes, lancamentos, diaSelecion
       <header class="quinzena__cabecalho">
         <h3>${titulo}</h3><span class="quinzena__periodo">dias ${primeiroDia} a ${ultimoDia}</span>
       </header>
-      ${grupoDeLancamentos({ titulo: 'Recebimentos', tipo: TIPO.RECEITA, quinzena, itens: doTipo(TIPO.RECEITA), diaSelecionado })}
-      ${grupoDeLancamentos({ titulo: 'Gastos', tipo: TIPO.DESPESA, quinzena, itens: doTipo(TIPO.DESPESA), diaSelecionado })}
+      ${grupoDeLancamentos({ titulo: 'Recebimentos', tipo: TIPO.RECEITA, quinzena, itens: doTipo(TIPO.RECEITA) })}
+      ${grupoDeLancamentos({ titulo: 'Gastos', tipo: TIPO.DESPESA, quinzena, itens: doTipo(TIPO.DESPESA) })}
       <footer class="quinzena__rodape">
         ${blocoDeTotal('Recebido', `${quinzena}-recebido`)}
         ${blocoDeTotal('Total', `${quinzena}-gasto`)}
@@ -108,7 +108,7 @@ function cartaoDaQuinzena({ quinzena, titulo, ano, mes, lancamentos, diaSelecion
     </section>`;
 }
 
-function grupoDeLancamentos({ titulo, tipo, quinzena, itens, diaSelecionado }) {
+function grupoDeLancamentos({ titulo, tipo, quinzena, itens }) {
   const rotuloDoBotao = tipo === TIPO.RECEITA ? '+ Recebimento' : '+ Gasto';
   return `
     <div class="grupo grupo--${tipo}">
@@ -118,15 +118,14 @@ function grupoDeLancamentos({ titulo, tipo, quinzena, itens, diaSelecionado }) {
       </div>
       <ul class="lista-lancamentos">
         ${itens.length === 0 ? '<li class="lista-vazia">Nenhum lançamento</li>' : ''}
-        ${itens.map((lancamento) => linhaDoLancamento(lancamento, diaSelecionado)).join('')}
+        ${itens.map(linhaDoLancamento).join('')}
       </ul>
     </div>`;
 }
 
-function linhaDoLancamento({ id, descricao, valorCentavos, dia }, diaSelecionado) {
-  const destaque = dia === diaSelecionado ? ' lancamento--do-dia' : '';
+function linhaDoLancamento({ id, descricao, valorCentavos, dia }) {
   return `
-    <li class="lancamento${destaque}" data-id="${escaparHtml(id)}">
+    <li class="lancamento" data-id="${escaparHtml(id)}">
       <span class="lancamento__dia" title="Dia do lançamento">${dia}</span>
       <input class="campo-descricao" value="${escaparHtml(descricao)}" aria-label="Descrição" enterkeyhint="done">
       <input class="campo-valor" value="${formatarParaEdicao(valorCentavos)}" inputmode="decimal"

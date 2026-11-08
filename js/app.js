@@ -3,18 +3,17 @@ import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
 import {
   ErroLancamentoInvalido, adicionarLancamento, alterarLancamento, criarLancamento,
-  intervaloDaQuinzena, limitarDiaAoMes, marcadoresDoMes, quinzenaDoDia, removerLancamento, resumirAno,
+  intervaloDaQuinzena, removerLancamento, resumirAno,
 } from './dominio/orcamento.js';
-import { criarCalendario } from './ui/calendario.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
 import { criarGradeQuinzenas } from './ui/gradeQuinzenas.js';
 import { criarPainelAnual } from './ui/painelAnual.js';
+import { criarSeletorDeMes } from './ui/seletorDeMes.js';
 
 const hoje = new Date();
 const estado = {
   ano: hoje.getFullYear(),
   mes: hoje.getMonth(),
-  diaSelecionado: hoje.getDate(),
   anoDoPainel: hoje.getFullYear(),
 };
 
@@ -23,9 +22,9 @@ const repositorio = criarRepositorioOrcamento({
   criarAnoInicial: (ano) => criarAnoConformePlanilha(ano, gerarId),
 });
 
-const calendario = criarCalendario(document.getElementById('calendario'), {
-  aoSelecionarDia: selecionarDia,
-  aoTrocarMes: trocarMes,
+const seletorDeMes = criarSeletorDeMes(document.getElementById('seletor-mes'), {
+  aoSelecionarMes: selecionarMes,
+  aoTrocarAno: trocarAno,
 });
 const grade = criarGradeQuinzenas(document.getElementById('quinzenas'), {
   aoAlterarValor: (id, valorCentavos) => atualizarLancamento(id, { valorCentavos }),
@@ -45,32 +44,26 @@ function salvarMes(lancamentos) {
 }
 
 function renderizarMes() {
-  const lancamentos = lancamentosDoMes();
-  const ehMesAtual = estado.ano === hoje.getFullYear() && estado.mes === hoje.getMonth();
-  calendario.renderizar({
+  const ehAnoAtual = estado.ano === hoje.getFullYear();
+  seletorDeMes.renderizar({
     ano: estado.ano,
-    mes: estado.mes,
-    diaSelecionado: estado.diaSelecionado,
-    diaDeHoje: ehMesAtual ? hoje.getDate() : undefined,
-    marcadores: marcadoresDoMes(lancamentos),
+    mesSelecionado: estado.mes,
+    mesAtual: ehAnoAtual ? hoje.getMonth() : undefined,
   });
-  grade.renderizar({ ano: estado.ano, mes: estado.mes, lancamentos, diaSelecionado: estado.diaSelecionado });
+  grade.renderizar({ ano: estado.ano, mes: estado.mes, lancamentos: lancamentosDoMes() });
 }
 
 function renderizarPainelAnual() {
   painelAnual.renderizar({ ano: estado.anoDoPainel, resumo: resumirAno(repositorio.obterAno(estado.anoDoPainel)) });
 }
 
-function selecionarDia(dia) {
-  estado.diaSelecionado = dia;
+function selecionarMes(mes) {
+  estado.mes = mes;
   renderizarMes();
 }
 
-function trocarMes(deslocamento) {
-  const primeiroDiaDoNovoMes = new Date(estado.ano, estado.mes + deslocamento, 1);
-  estado.ano = primeiroDiaDoNovoMes.getFullYear();
-  estado.mes = primeiroDiaDoNovoMes.getMonth();
-  estado.diaSelecionado = limitarDiaAoMes(estado.diaSelecionado, estado.ano, estado.mes);
+function trocarAno(deslocamento) {
+  estado.ano += deslocamento;
   renderizarMes();
 }
 
@@ -99,8 +92,7 @@ function excluirLancamento(id) {
 
 async function incluirLancamento(tipo, quinzena) {
   const intervalo = intervaloDaQuinzena(quinzena, estado.ano, estado.mes);
-  const diaSugerido = quinzenaDoDia(estado.diaSelecionado) === quinzena ? estado.diaSelecionado : intervalo.primeiroDia;
-  const digitado = await dialogo.abrir({ tipo, intervalo, diaSugerido });
+  const digitado = await dialogo.abrir({ tipo, intervalo, diaSugerido: intervalo.primeiroDia });
   if (!digitado) return;
 
   try {
@@ -149,8 +141,10 @@ function obterArmazenamentoDoAparelho() {
   }
 }
 
+/** No APK os arquivos já vêm dentro do app; o service worker só serve à versão web. */
 function registrarFuncionamentoOffline() {
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+  const ehAppNativo = window.Capacitor?.isNativePlatform?.() ?? false;
+  if (!ehAppNativo && 'serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 }
 
 configurarAbas();

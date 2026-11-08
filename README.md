@@ -20,9 +20,23 @@ basta enviar esta pasta inteira. Depois:
 
 Ao publicar uma nova versão, troque `VERSAO_DO_CACHE` em `sw.js`.
 
+## Gerar o APK (Android)
+
+Requisitos: JDK 21 e Android SDK (platform 35). Se o SDK não estiver no caminho padrão,
+crie `android/local.properties` com `sdk.dir=...`.
+
+```bash
+npm install
+npm run apk   # gera OrcamentoQuinzenal.apk na raiz do projeto
+```
+
+O APK é de depuração (assinado com a chave de debug): serve para instalar direto no celular,
+permitindo "instalar apps desconhecidos". Para a Play Store é preciso um build de release assinado.
+Para trocar os ícones: `python ferramentas/gerarIcones.py icones android/app/src/main/res`.
+
 ## Estrutura
 
 - `js/dominio/` — regras puras: dinheiro em centavos, quinzenas, totais, resumo anual.
 - `js/dados/` — preenchimento inicial da planilha e repositório (localStorage injetado).
-- `js/ui/` — calendário, grade das quinzenas, painel anual, janela de lançamento.
+- `js/ui/` — seletor de mês, grade das quinzenas, painel anual, janela de lançamento.
 - `js/app.js` — ponto de composição e estado da tela.

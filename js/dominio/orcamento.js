@@ -86,18 +86,6 @@ function somarPorTipo(lancamentos, tipo) {
     .reduce((soma, lancamento) => soma + lancamento.valorCentavos, 0);
 }
 
-/** Dias do mês que têm lançamentos, para o calendário marcar. */
-export function marcadoresDoMes(lancamentos) {
-  const marcadores = new Map();
-  for (const { dia, tipo } of lancamentos) {
-    const marcador = marcadores.get(dia) ?? { temReceita: false, temDespesa: false };
-    if (tipo === TIPO.RECEITA) marcador.temReceita = true;
-    else marcador.temDespesa = true;
-    marcadores.set(dia, marcador);
-  }
-  return marcadores;
-}
-
 /** @param {Array<Array>} lancamentosPorMes - 12 listas, de janeiro (0) a dezembro (11). */
 export function resumirAno(lancamentosPorMes) {
   const totaisPorMes = lancamentosPorMes.map(totalizar);

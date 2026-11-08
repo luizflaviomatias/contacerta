@@ -71,29 +71,24 @@ button { cursor: pointer; }
 }
 .cartao h3 { margin: 4px 0 8px; font-size: 1rem; }
 
-/* Calendário */
-.calendario__cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.calendario__titulo { margin: 0; font-size: 1.1rem; }
-.calendario__grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
-.calendario__semana { font-size: .75rem; color: var(--texto-suave); padding: 4px 0; }
-.calendario__dia {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  aspect-ratio: 1; min-height: 38px; border: 0; border-radius: 10px; background: transparent; padding: 0;
+/* Seletor de mês */
+.seletor-mes__cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.seletor-mes__titulo { margin: 0; font-size: 1.1rem; }
+.seletor-mes__grade { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.seletor-mes__mes {
+  min-height: 44px; border: 0; border-radius: 10px; background: var(--campo);
+  font-weight: 500;
 }
-.calendario__dia--hoje { box-shadow: inset 0 0 0 1.5px var(--primaria); font-weight: 600; }
-.calendario__dia--selecionado { background: var(--primaria); color: #fff; }
-@media (prefers-color-scheme: dark) { .calendario__dia--selecionado { color: #042f2e; } }
-.calendario__marcas { display: flex; gap: 3px; height: 6px; }
-.marca { width: 6px; height: 6px; border-radius: 50%; }
-.marca--receita { background: var(--receita); }
-.marca--despesa { background: var(--despesa); }
-.calendario__dia--selecionado .marca { background: currentColor; }
+.seletor-mes__mes--atual { box-shadow: inset 0 0 0 1.5px var(--primaria); font-weight: 700; }
+.seletor-mes__mes--selecionado { background: var(--primaria); color: #fff; font-weight: 700; }
+@media (prefers-color-scheme: dark) { .seletor-mes__mes--selecionado { color: #042f2e; } }
 
 .botao-icone {
   border: 0; background: transparent; min-width: 40px; min-height: 40px;
   border-radius: 10px; font-size: 1.4rem; line-height: 1;
 }
-.botao-icone:active, .calendario__dia:active { background: var(--primaria-suave); }
+.botao-icone:active, .seletor-mes__mes:active { background: var(--primaria-suave); }
+.seletor-mes__mes--selecionado:active { background: var(--primaria); }
 
 /* Resumo e totais */
 .resumo-mes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
@@ -119,7 +114,6 @@ button { cursor: pointer; }
   display: grid; grid-template-columns: 20px 1fr 92px 28px; gap: 4px; align-items: center;
   padding: 4px 0; border-top: 1px solid var(--borda);
 }
-.lancamento--do-dia { background: var(--primaria-suave); border-radius: 8px; }
 .lancamento__dia { font-size: .75rem; color: var(--texto-suave); text-align: center; }
 .lancamento input {
   width: 100%; min-width: 0; border: 1px solid transparent; border-radius: 8px;

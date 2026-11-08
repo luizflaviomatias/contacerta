@@ -1,10 +1,20 @@
 {
   "name": "orcamento-quinzenal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node ferramentas/servidor.mjs 5173",
-    "test": "node --test testes/"
+    "test": "node --test testes/",
+    "www": "node ferramentas/prepararWww.mjs",
+    "android:sync": "npm run www && cap sync android",
+    "apk": "npm run android:sync && node ferramentas/gerarApk.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.4.4",
+    "@capacitor/core": "7.4.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "7.4.4"
   }
 }

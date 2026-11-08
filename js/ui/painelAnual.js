@@ -11,9 +11,9 @@ export function criarPainelAnual(container, { aoTrocarAno }) {
 
   function renderizar({ ano, resumo }) {
     container.innerHTML = `
-      <div class="calendario__cabecalho">
+      <div class="seletor-mes__cabecalho">
         <button class="botao-icone" data-acao="ano-anterior" aria-label="Ano anterior">‹</button>
-        <h2 class="calendario__titulo">Visão anual ${ano}</h2>
+        <h2 class="seletor-mes__titulo">Visão anual ${ano}</h2>
         <button class="botao-icone" data-acao="ano-seguinte" aria-label="Próximo ano">›</button>
       </div>
       <div class="big-numbers">
