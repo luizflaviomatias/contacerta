@@ -183,3 +183,44 @@ button { cursor: pointer; }
 .botao-primario { background: var(--primaria); color: #fff; border-color: transparent; }
 .botao-secundario { background: transparent; }
 @media (prefers-color-scheme: dark) { .botao-primario { color: #042f2e; } }
+
+/* Abas das quinzenas */
+.abas-quinzena { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.aba-quinzena {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border: 1px solid var(--borda); border-radius: var(--raio); background: var(--superficie);
+  padding: 10px 6px; color: var(--texto-suave);
+}
+.aba-quinzena__titulo { font-weight: 700; }
+.aba-quinzena__saldo { font-size: .78rem; }
+.aba-quinzena__saldo strong { font-variant-numeric: tabular-nums; }
+.aba-quinzena[aria-selected="true"] {
+  background: var(--primaria); border-color: transparent; color: #fff;
+}
+.aba-quinzena[aria-selected="true"] .valor--negativo { color: #fecaca; }
+@media (prefers-color-scheme: dark) { .aba-quinzena[aria-selected="true"] { color: #042f2e; } }
+
+/* Copiar mês */
+.botao-copiar {
+  width: 100%; margin-bottom: 12px; padding: 12px; border-radius: var(--raio);
+  border: 1px dashed var(--primaria); background: transparent; color: var(--primaria); font-weight: 600;
+}
+.botao-copiar:active { background: var(--primaria-suave); }
+.dialogo__aviso { margin: 0 0 12px; font-size: .88rem; color: var(--texto-suave); }
+.lista-opcoes-mes {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px;
+  max-height: 50vh; overflow-y: auto; margin-bottom: 4px;
+}
+.dialogo .opcao-mes {
+  flex-direction: row; align-items: center; gap: 8px; margin: 0;
+  padding: 8px 4px; font-size: .95rem; color: var(--texto);
+}
+.opcao-mes input { width: 20px; height: 20px; accent-color: var(--primaria); }
+
+/* Aviso */
+.aviso {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 3;
+  bottom: calc(env(safe-area-inset-bottom) + 72px);
+  max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 999px;
+  background: var(--texto); color: var(--fundo); font-size: .9rem; box-shadow: 0 4px 12px rgb(0 0 0 / .2);
+}

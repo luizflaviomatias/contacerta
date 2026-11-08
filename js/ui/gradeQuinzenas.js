@@ -10,7 +10,7 @@ const QUINZENAS = [
 ];
 
 /**
- * Grade do mês dividida em 1ª e 2ª quinzena.
+ * Grade do mês com a 1ª e a 2ª quinzena em abas.
  * Ao digitar um valor, só os totais são redesenhados — o campo em edição mantém o foco.
  */
 export function criarGradeQuinzenas(container, acoes) {
@@ -25,18 +25,26 @@ export function criarGradeQuinzenas(container, acoes) {
   container.addEventListener('click', (evento) => {
     const botao = evento.target.closest('button[data-acao]');
     if (!botao) return;
-    if (botao.dataset.acao === 'excluir') acoes.aoExcluir(idDaLinha(botao));
-    if (botao.dataset.acao === 'adicionar') acoes.aoAdicionar(botao.dataset.tipo, botao.dataset.quinzena);
+    const acoesDosBotoes = {
+      excluir: () => acoes.aoExcluir(idDaLinha(botao)),
+      adicionar: () => acoes.aoAdicionar(botao.dataset.tipo, botao.dataset.quinzena),
+      'trocar-quinzena': () => acoes.aoTrocarQuinzena(botao.dataset.quinzena),
+    };
+    acoesDosBotoes[botao.dataset.acao]?.();
   });
 
-  function renderizar({ ano, mes, lancamentos }) {
+  function renderizar({ ano, mes, lancamentos, quinzenaAtiva }) {
+    const definicaoAtiva = QUINZENAS.find(({ quinzena }) => quinzena === quinzenaAtiva);
     container.innerHTML = `
+      <div class="abas-quinzena" role="tablist" aria-label="Quinzenas">
+        ${QUINZENAS.map((definicao) => abaDaQuinzena(definicao, quinzenaAtiva)).join('')}
+      </div>
+      ${cartaoDaQuinzena({ ...definicaoAtiva, ano, mes, lancamentos })}
       <section class="resumo-mes" aria-label="Resumo do mês">
         ${blocoDeTotal('Recebido no mês', 'mes-recebido')}
         ${blocoDeTotal('Gasto no mês', 'mes-gasto')}
         ${blocoDeTotal('Saldo do mês', 'mes-saldo')}
-      </section>
-      ${QUINZENAS.map((definicao) => cartaoDaQuinzena({ ...definicao, ano, mes, lancamentos })).join('')}`;
+      </section>`;
     atualizarTotais(lancamentos);
   }
 
@@ -50,14 +58,16 @@ export function criarGradeQuinzenas(container, acoes) {
   function exibirTotais(prefixo, { recebido, gasto, saldo }) {
     escreverTotal(`${prefixo}-recebido`, recebido);
     escreverTotal(`${prefixo}-gasto`, gasto);
-    const elementoSaldo = escreverTotal(`${prefixo}-saldo`, saldo);
-    elementoSaldo.classList.toggle('valor--negativo', saldo < 0);
+    for (const elementoSaldo of escreverTotal(`${prefixo}-saldo`, saldo)) {
+      elementoSaldo.classList.toggle('valor--negativo', saldo < 0);
+    }
   }
 
+  /** A mesma chave pode aparecer na aba e no rodapé; a quinzena oculta não tem rodapé. */
   function escreverTotal(chave, centavos) {
-    const elemento = container.querySelector(`[data-total="${chave}"]`);
-    elemento.textContent = formatarMoeda(centavos);
-    return elemento;
+    const elementos = container.querySelectorAll(`[data-total="${chave}"]`);
+    for (const elemento of elementos) elemento.textContent = formatarMoeda(centavos);
+    return elementos;
   }
 
   return { renderizar, atualizarTotais };
@@ -86,6 +96,15 @@ function idDaLinha(elemento) {
 function blocoDeTotal(rotulo, chave) {
   return `<div class="total"><span class="total__rotulo">${rotulo}</span>
           <strong class="total__valor" data-total="${chave}"></strong></div>`;
+}
+
+function abaDaQuinzena({ quinzena, titulo }, quinzenaAtiva) {
+  const ativa = quinzena === quinzenaAtiva;
+  return `
+    <button class="aba-quinzena" role="tab" aria-selected="${ativa}" data-acao="trocar-quinzena" data-quinzena="${quinzena}">
+      <span class="aba-quinzena__titulo">${titulo}</span>
+      <span class="aba-quinzena__saldo">Saldo <strong data-total="${quinzena}-saldo"></strong></span>
+    </button>`;
 }
 
 function cartaoDaQuinzena({ quinzena, titulo, ano, mes, lancamentos }) {

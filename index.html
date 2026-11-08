@@ -24,6 +24,9 @@
     <section id="aba-mes" role="tabpanel" aria-label="Mês">
       <div id="seletor-mes" class="cartao seletor-mes"></div>
       <div id="quinzenas"></div>
+      <button id="botao-copiar-mes" class="botao-copiar" type="button">
+        <span aria-hidden="true">⧉</span> Copiar este mês para os meses seguintes
+      </button>
     </section>
     <section id="aba-anual" role="tabpanel" aria-label="Visão anual" hidden>
       <div id="painel-anual"></div>
@@ -58,6 +61,24 @@
       </div>
     </form>
   </dialog>
+
+  <dialog id="dialogo-copia" class="dialogo">
+    <form>
+      <h2 data-campo="titulo">Copiar mês</h2>
+      <p class="dialogo__aviso">
+        Marque os meses que vão receber uma cópia de todos os lançamentos deste mês.
+        Os lançamentos que já existem nesses meses serão <strong>substituídos</strong>.
+      </p>
+      <div class="lista-opcoes-mes" data-campo="meses"></div>
+      <p class="dialogo__erro" data-campo="erro" role="alert"></p>
+      <div class="dialogo__acoes">
+        <button type="submit" value="cancelar" formnovalidate class="botao-secundario">Cancelar</button>
+        <button type="submit" value="copiar" class="botao-primario">Copiar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
 
   <script type="module" src="js/app.js"></script>
 </body>

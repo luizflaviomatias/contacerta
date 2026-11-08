@@ -2,18 +2,23 @@
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
 import {
-  ErroLancamentoInvalido, adicionarLancamento, alterarLancamento, criarLancamento,
-  intervaloDaQuinzena, removerLancamento, resumirAno,
+  ErroLancamentoInvalido, adicionarLancamento, alterarLancamento, copiarLancamentosParaMes, criarLancamento,
+  intervaloDaQuinzena, mesesSeguintes, quinzenaDoDia, removerLancamento, resumirAno,
 } from './dominio/orcamento.js';
+import { criarAviso } from './ui/aviso.js';
+import { criarDialogoCopia } from './ui/dialogoCopia.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
 import { criarGradeQuinzenas } from './ui/gradeQuinzenas.js';
 import { criarPainelAnual } from './ui/painelAnual.js';
 import { criarSeletorDeMes } from './ui/seletorDeMes.js';
 
+const MESES_OFERECIDOS_NA_COPIA = 12;
+
 const hoje = new Date();
 const estado = {
   ano: hoje.getFullYear(),
   mes: hoje.getMonth(),
+  quinzena: quinzenaDoDia(hoje.getDate()),
   anoDoPainel: hoje.getFullYear(),
 };
 
@@ -31,9 +36,13 @@ const grade = criarGradeQuinzenas(document.getElementById('quinzenas'), {
   aoAlterarDescricao: (id, descricao) => atualizarLancamento(id, { descricao }),
   aoExcluir: excluirLancamento,
   aoAdicionar: incluirLancamento,
+  aoTrocarQuinzena: trocarQuinzena,
 });
 const painelAnual = criarPainelAnual(document.getElementById('painel-anual'), { aoTrocarAno: trocarAnoDoPainel });
-const dialogo = criarDialogoLancamento(document.getElementById('dialogo-lancamento'));
+const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'));
+const dialogoCopia = criarDialogoCopia(document.getElementById('dialogo-copia'));
+const aviso = criarAviso(document.getElementById('aviso'));
+document.getElementById('botao-copiar-mes').addEventListener('click', copiarMesParaSeguintes);
 
 function lancamentosDoMes() {
   return repositorio.obterMes(estado.ano, estado.mes);
@@ -50,7 +59,33 @@ function renderizarMes() {
     mesSelecionado: estado.mes,
     mesAtual: ehAnoAtual ? hoje.getMonth() : undefined,
   });
-  grade.renderizar({ ano: estado.ano, mes: estado.mes, lancamentos: lancamentosDoMes() });
+  grade.renderizar({
+    ano: estado.ano,
+    mes: estado.mes,
+    lancamentos: lancamentosDoMes(),
+    quinzenaAtiva: estado.quinzena,
+  });
+}
+
+function trocarQuinzena(quinzena) {
+  estado.quinzena = quinzena;
+  renderizarMes();
+}
+
+/** Por padrão, marca os meses que faltam no ano; os do ano seguinte ficam disponíveis, desmarcados. */
+async function copiarMesParaSeguintes() {
+  const origem = { ano: estado.ano, mes: estado.mes };
+  const opcoes = mesesSeguintes(origem, MESES_OFERECIDOS_NA_COPIA)
+    .map((destino) => ({ ...destino, marcado: destino.ano === origem.ano }));
+  const destinos = await dialogoCopia.abrir({ origem, opcoes });
+  if (!destinos) return;
+
+  const lancamentosDaOrigem = lancamentosDoMes();
+  for (const destino of destinos) {
+    const copia = copiarLancamentosParaMes(lancamentosDaOrigem, { origem, destino, gerarId });
+    repositorio.salvarMes(destino.ano, destino.mes, copia);
+  }
+  aviso.mostrar(destinos.length === 1 ? '1 mês recebeu a cópia.' : `${destinos.length} meses receberam a cópia.`);
 }
 
 function renderizarPainelAnual() {
@@ -92,7 +127,7 @@ function excluirLancamento(id) {
 
 async function incluirLancamento(tipo, quinzena) {
   const intervalo = intervaloDaQuinzena(quinzena, estado.ano, estado.mes);
-  const digitado = await dialogo.abrir({ tipo, intervalo, diaSugerido: intervalo.primeiroDia });
+  const digitado = await dialogoLancamento.abrir({ tipo, intervalo, diaSugerido: intervalo.primeiroDia });
   if (!digitado) return;
 
   try {

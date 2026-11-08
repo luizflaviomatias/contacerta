@@ -14,6 +14,17 @@ export class ErroLancamentoInvalido extends Error {
   }
 }
 
+export class ErroCopiaParaMesAnterior extends Error {
+  constructor(origem, destino) {
+    super(`Só é possível copiar para meses seguintes: ${rotuloDoMes(origem)} → ${rotuloDoMes(destino)}`);
+    this.name = 'ErroCopiaParaMesAnterior';
+  }
+}
+
+function rotuloDoMes({ ano, mes }) {
+  return `${String(mes + 1).padStart(2, '0')}/${ano}`;
+}
+
 export function diasNoMes(ano, mes) {
   return new Date(ano, mes + 1, 0).getDate();
 }
@@ -30,6 +41,31 @@ export function intervaloDaQuinzena(quinzena, ano, mes) {
   return quinzena === QUINZENA.PRIMEIRA
     ? { primeiroDia: 1, ultimoDia: ULTIMO_DIA_DA_PRIMEIRA_QUINZENA }
     : { primeiroDia: ULTIMO_DIA_DA_PRIMEIRA_QUINZENA + 1, ultimoDia: diasNoMes(ano, mes) };
+}
+
+/** Os `quantidade` meses depois de `referencia`, atravessando o ano se preciso. */
+export function mesesSeguintes(referencia, quantidade) {
+  return Array.from({ length: quantidade }, (_, indice) => {
+    const primeiroDia = new Date(referencia.ano, referencia.mes + indice + 1, 1);
+    return { ano: primeiroDia.getFullYear(), mes: primeiroDia.getMonth() };
+  });
+}
+
+export function ehMesPosterior(mes, referencia) {
+  return mes.ano > referencia.ano || (mes.ano === referencia.ano && mes.mes > referencia.mes);
+}
+
+/**
+ * Cópias (com ids novos) dos lançamentos de `origem` para `destino`, que precisa ser um mês seguinte.
+ * Dias que não existem no destino (ex.: 30 em fevereiro) vão para o último dia do mês.
+ */
+export function copiarLancamentosParaMes(lancamentos, { origem, destino, gerarId }) {
+  if (!ehMesPosterior(destino, origem)) throw new ErroCopiaParaMesAnterior(origem, destino);
+  return lancamentos.map((lancamento) => criarLancamento({
+    ...lancamento,
+    id: gerarId(),
+    dia: limitarDiaAoMes(lancamento.dia, destino.ano, destino.mes),
+  }));
 }
 
 export function criarLancamento({ id, descricao, tipo, valorCentavos, dia }) {
