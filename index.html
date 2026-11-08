@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Orçamento Quinzenal</title>
+  <meta name="description" content="Controle de orçamento para quem recebe o salário em duas vezes no mês.">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Orçamento">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icones/icone-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icones/icone-180.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topo">
+    <h1>Orçamento Quinzenal</h1>
+  </header>
+
+  <main class="conteudo">
+    <section id="aba-mes" role="tabpanel" aria-label="Mês">
+      <div id="calendario" class="cartao calendario"></div>
+      <div id="quinzenas"></div>
+    </section>
+    <section id="aba-anual" role="tabpanel" aria-label="Visão anual" hidden>
+      <div id="painel-anual"></div>
+    </section>
+  </main>
+
+  <nav class="barra-abas" role="tablist">
+    <button role="tab" data-aba="mes" aria-controls="aba-mes" aria-selected="true">
+      <span aria-hidden="true">📅</span> Mês
+    </button>
+    <button role="tab" data-aba="anual" aria-controls="aba-anual" aria-selected="false">
+      <span aria-hidden="true">📊</span> Anual
+    </button>
+  </nav>
+
+  <dialog id="dialogo-lancamento" class="dialogo">
+    <form>
+      <h2 data-campo="titulo">Novo lançamento</h2>
+      <label>Descrição
+        <input name="descricao" required maxlength="60" autocomplete="off" enterkeyhint="next">
+      </label>
+      <label>Valor (R$)
+        <input name="valor" inputmode="decimal" placeholder="0,00" autocomplete="off" enterkeyhint="next">
+      </label>
+      <label>Dia
+        <input name="dia" type="number" inputmode="numeric" required>
+      </label>
+      <p class="dialogo__erro" data-campo="erro" role="alert"></p>
+      <div class="dialogo__acoes">
+        <button type="submit" value="cancelar" formnovalidate class="botao-secundario">Cancelar</button>
+        <button type="submit" value="salvar" class="botao-primario">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
