@@ -1,4 +1,4 @@
-package io.github.luizflaviomatias.orcamentoquinzenal;
+package io.github.luizflaviomatias.contacerta;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -5,10 +5,10 @@ def versaoDoApp = new groovy.json.JsonSlurper().parse(file('../../package.json')
 def (versaoMaior, versaoMenor, versaoCorrecao) = versaoDoApp.tokenize('.').collect { it as int }
 
 android {
-    namespace "io.github.luizflaviomatias.orcamentoquinzenal"
+    namespace "io.github.luizflaviomatias.contacerta"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "io.github.luizflaviomatias.orcamentoquinzenal"
+        applicationId "io.github.luizflaviomatias.contacerta"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode versaoMaior * 10000 + versaoMenor * 100 + versaoCorrecao

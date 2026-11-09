@@ -1,8 +1,9 @@
 // Guarda os lançamentos por ano. O armazenamento é injetado (localStorage no app, memória nos testes).
 import { MESES_NO_ANO, criarLancamento } from '../dominio/orcamento.js';
 
-// Nome antigo do app mantido de propósito: trocar a chave apagaria os lançamentos de quem já usa.
-const PREFIXO_DA_CHAVE = 'orcamento-quinzenal:ano:';
+const PREFIXO_DA_CHAVE = 'contacerta:ano:';
+/** Nome usado quando o app se chamava Orçamento Quinzenal: lido uma vez e copiado para o nome novo. */
+const PREFIXO_DA_CHAVE_ANTIGA = 'orcamento-quinzenal:ano:';
 const SUFIXO_DA_COPIA_CORROMPIDA = ':corrompido';
 
 export class ErroArmazenamento extends Error {
@@ -34,8 +35,15 @@ export function criarRepositorioOrcamento({ armazenamento, criarAnoInicial }) {
   }
 
   function lerOuCriarAno(ano) {
-    const salvo = armazenamento.getItem(chaveDoAno(ano));
+    const salvo = armazenamento.getItem(chaveDoAno(ano)) ?? migrarDoNomeAntigo(ano);
     return salvo === null ? criarEGravarAno(ano) : desserializarAno(ano, salvo);
+  }
+
+  /** Copia o ano salvo com o nome antigo para o nome novo; a cópia antiga fica guardada por segurança. */
+  function migrarDoNomeAntigo(ano) {
+    const salvoComNomeAntigo = armazenamento.getItem(chaveAntigaDoAno(ano));
+    if (salvoComNomeAntigo !== null) gravar(chaveDoAno(ano), salvoComNomeAntigo, ano);
+    return salvoComNomeAntigo;
   }
 
   function criarEGravarAno(ano) {
@@ -72,7 +80,9 @@ export function criarRepositorioOrcamento({ armazenamento, criarAnoInicial }) {
   }
 
   return {
-    existeAnoSalvo: (ano) => anosCarregados.has(ano) || armazenamento.getItem(chaveDoAno(ano)) !== null,
+    existeAnoSalvo: (ano) => anosCarregados.has(ano)
+      || armazenamento.getItem(chaveDoAno(ano)) !== null
+      || armazenamento.getItem(chaveAntigaDoAno(ano)) !== null,
     obterMes: (ano, mes) => obterAno(ano)[mes],
     obterAno,
     salvarMes,
@@ -82,6 +92,10 @@ export function criarRepositorioOrcamento({ armazenamento, criarAnoInicial }) {
 
 function chaveDoAno(ano) {
   return `${PREFIXO_DA_CHAVE}${ano}`;
+}
+
+function chaveAntigaDoAno(ano) {
+  return `${PREFIXO_DA_CHAVE_ANTIGA}${ano}`;
 }
 
 function desserializarAno(ano, json) {

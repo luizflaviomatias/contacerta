@@ -20,7 +20,7 @@ test('cria o ano inicial uma única vez e o persiste', () => {
   repositorio.obterMes(2026, 5);
 
   assert.equal(anosCriados, 1);
-  assert.ok(armazenamento.dados.has('orcamento-quinzenal:ano:2026'));
+  assert.ok(armazenamento.dados.has('contacerta:ano:2026'));
 });
 
 test('mês salvo é lido de volta por um novo repositório', () => {
@@ -34,7 +34,7 @@ test('mês salvo é lido de volta por um novo repositório', () => {
 });
 
 test('dados corrompidos geram erro com contexto', () => {
-  const armazenamento = criarArmazenamentoEmMemoria({ 'orcamento-quinzenal:ano:2026': '{quebrado' });
+  const armazenamento = criarArmazenamentoEmMemoria({ 'contacerta:ano:2026': '{quebrado' });
   const repositorio = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio });
   assert.throws(() => repositorio.obterAno(2026), ErroArmazenamento);
 });
@@ -43,7 +43,7 @@ test('lançamento salvo antes da marca de pago é lido como não pago', () => {
   const { pago, ...gastoAntigo } = gasto;
   const meses = anoVazio();
   meses[10] = [gastoAntigo];
-  const armazenamento = criarArmazenamentoEmMemoria({ 'orcamento-quinzenal:ano:2026': JSON.stringify(meses) });
+  const armazenamento = criarArmazenamentoEmMemoria({ 'contacerta:ano:2026': JSON.stringify(meses) });
 
   const [lido] = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio }).obterMes(2026, 10);
 
@@ -72,17 +72,39 @@ test('se gravar falhar, o mês na memória continua como estava', () => {
 });
 
 test('ano corrompido gera erro que diz qual ano é', () => {
-  const armazenamento = criarArmazenamentoEmMemoria({ 'orcamento-quinzenal:ano:2025': '[1,2]' });
+  const armazenamento = criarArmazenamentoEmMemoria({ 'contacerta:ano:2025': '[1,2]' });
   const repositorio = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio });
   assert.throws(() => repositorio.obterMes(2025, 0), (erro) => erro instanceof ErroAnoCorrompido && erro.ano === 2025);
 });
 
 test('recomeçar um ano corrompido guarda o conteúdo antigo à parte e cria o ano de novo', () => {
-  const armazenamento = criarArmazenamentoEmMemoria({ 'orcamento-quinzenal:ano:2025': '{quebrado' });
+  const armazenamento = criarArmazenamentoEmMemoria({ 'contacerta:ano:2025': '{quebrado' });
   const repositorio = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio });
 
   repositorio.recomecarAno(2025);
 
   assert.deepEqual(repositorio.obterMes(2025, 0), []);
-  assert.equal(armazenamento.dados.get('orcamento-quinzenal:ano:2025:corrompido'), '{quebrado');
+  assert.equal(armazenamento.dados.get('contacerta:ano:2025:corrompido'), '{quebrado');
+});
+
+test('ano salvo com o nome antigo do app é lido e passa para o nome novo', () => {
+  const meses = anoVazio();
+  meses[10] = [gasto];
+  const armazenamento = criarArmazenamentoEmMemoria({ 'orcamento-quinzenal:ano:2026': JSON.stringify(meses) });
+  const repositorio = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio });
+
+  assert.equal(repositorio.existeAnoSalvo(2026), true);
+  assert.deepEqual(repositorio.obterMes(2026, 10), [gasto]);
+  assert.equal(armazenamento.dados.get('contacerta:ano:2026'), JSON.stringify(meses));
+  assert.ok(armazenamento.dados.has('orcamento-quinzenal:ano:2026'), 'a cópia antiga fica guardada por segurança');
+});
+
+test('quando existem os dois nomes, vale o nome novo', () => {
+  const meses = anoVazio();
+  meses[0] = [gasto];
+  const armazenamento = criarArmazenamentoEmMemoria({
+    'orcamento-quinzenal:ano:2026': JSON.stringify(anoVazio()),
+    'contacerta:ano:2026': JSON.stringify(meses),
+  });
+  assert.deepEqual(criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio }).obterMes(2026, 0), [gasto]);
 });

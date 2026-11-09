@@ -1,6 +1,6 @@
 // O que vem do aparelho: armazenamento, relógio e funcionamento sem internet.
 
-const CHAVE_DE_TESTE_DO_ARMAZENAMENTO = 'orcamento-quinzenal:teste';
+const CHAVE_DE_TESTE_DO_ARMAZENAMENTO = 'contacerta:teste';
 
 /** No modo privado do Safari o localStorage pode falhar: aí os dados ficam só em memória. */
 export function obterArmazenamentoDoAparelho() {

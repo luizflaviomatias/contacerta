@@ -267,7 +267,7 @@
             botões fáceis de tocar e nada de termos complicados.
           </p>
           <div class="acoes">
-            <a class="botao botao--principal" href="https://github.com/luizflaviomatias/orcamento-quinzenal/releases/latest" data-download-android>
+            <a class="botao botao--principal" href="https://github.com/luizflaviomatias/contacerta/releases/latest" data-download-android>
               <svg class="icone" aria-hidden="true"><use href="#i-baixar"/></svg>
               <span>Baixar para Android<small data-detalhe-android>Arquivo APK</small></span>
             </a>
@@ -435,7 +435,7 @@
               <li>Toque em <strong>Instalar</strong> (ou <strong>Atualizar</strong>, se já tiver o app).</li>
             </ol>
             <p class="detalhe-download" data-detalhe-android-completo>Versão mais recente, publicada no GitHub.</p>
-            <a class="botao botao--principal" href="https://github.com/luizflaviomatias/orcamento-quinzenal/releases/latest" data-download-android>
+            <a class="botao botao--principal" href="https://github.com/luizflaviomatias/contacerta/releases/latest" data-download-android>
               <svg class="icone" aria-hidden="true"><use href="#i-baixar"/></svg><span>Baixar APK</span>
             </a>
           </article>
@@ -517,7 +517,7 @@
   <footer>
     <div class="conteiner">
       <span>ContaCerta · Orçamento simples, por mês ou por quinzena</span>
-      <span><a href="https://github.com/luizflaviomatias/orcamento-quinzenal/releases">Todas as versões</a> · <a href="../">Abrir o app</a></span>
+      <span><a href="https://github.com/luizflaviomatias/contacerta/releases">Todas as versões</a> · <a href="../">Abrir o app</a></span>
     </div>
   </footer>
 
@@ -525,7 +525,7 @@
     // Aponta os botões de Android para o APK da versão mais recente publicada no GitHub.
     // Sem internet ou se a consulta falhar, os botões continuam levando à página da versão mais recente.
     (async function apontarParaOApkMaisRecente() {
-      const RELEASE_MAIS_RECENTE = 'https://api.github.com/repos/luizflaviomatias/orcamento-quinzenal/releases/latest';
+      const RELEASE_MAIS_RECENTE = 'https://api.github.com/repos/luizflaviomatias/contacerta/releases/latest';
       try {
         const resposta = await fetch(RELEASE_MAIS_RECENTE, { headers: { Accept: 'application/vnd.github+json' } });
         if (!resposta.ok) return;
