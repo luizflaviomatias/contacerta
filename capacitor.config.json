@@ -3,7 +3,8 @@
   "appName": "ContaCerta",
   "webDir": "www",
   "android": {
-    "backgroundColor": "#f7f6fa"
+    "backgroundColor": "#f7f6fa",
+    "adjustMarginsForEdgeToEdge": "auto"
   },
   "plugins": {
     "CapacitorUpdater": {

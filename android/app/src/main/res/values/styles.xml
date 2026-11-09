@@ -13,6 +13,11 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- Com o app fora das barras do sistema (Android 15), o fundo da janela fica atrás delas:
+             roxo como o topo do app, com ícones claros por cima. -->
+        <item name="android:windowBackground">@color/roxo_contacerta</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 
 

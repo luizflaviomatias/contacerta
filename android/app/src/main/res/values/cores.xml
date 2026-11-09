@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Roxo do topo do app: aparece atrás da barra de status e da barra de navegação do Android. -->
+    <color name="roxo_contacerta">#5B2DB5</color>
+</resources>
