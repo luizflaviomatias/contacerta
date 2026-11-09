@@ -1,8 +1,9 @@
 // Ponto de composição: cria as dependências, liga telas, ações e preferências, e guarda o estado da tela.
 import { criarAcoesDoMes } from './acoesDoMes.js';
 import {
-  criarRelogio, gerarId, obterArmazenamentoDoAparelho, registrarFuncionamentoOffline,
+  ENDERECO_DO_ANUNCIO_DE_ATUALIZACAO, criarRelogio, gerarId, obterArmazenamentoDoAparelho, registrarFuncionamentoOffline,
 } from './ambiente.js';
+import { criarAtualizador, criarBuscaDeAnuncio } from './atualizador.js';
 import { criarAvisoDispensado } from './dados/avisoDispensado.js';
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
 import { criarPreferencias } from './dados/preferencias.js';
@@ -12,11 +13,13 @@ import { resumirContasAPagar, vencimentosDoDia } from './dominio/contasAPagar.js
 import { MODO, deslocarMes, periodoDoDia, resumirAno } from './dominio/orcamento.js';
 import { aplicarTextosNaPagina, criarLocalizacao } from './i18n/localizacao.js';
 import { criarNavegacao } from './navegacao.js';
+import { criarAtualizacaoNativa, obterPluginDeAtualizacao } from './plataforma/atualizacaoNativa.js';
 import { criarTratamentoDeErros } from './tratamentoDeErros.js';
 import { criarAviso } from './ui/aviso.js';
 import { criarDialogoConfirmacao } from './ui/dialogoConfirmacao.js';
 import { criarDialogoCopia } from './ui/dialogoCopia.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
+import { criarFaixaDeAtualizacao } from './ui/faixaDeAtualizacao.js';
 import { criarFaixaDeVencimentos } from './ui/faixaDeVencimentos.js';
 import { criarGradeDoMes } from './ui/gradeDoMes.js';
 import { criarMenuLateral } from './ui/menuLateral.js';
@@ -218,7 +221,22 @@ function aplicarPreferencias(atuais) {
   seletorDeModo.renderizar(modoDeControle());
 }
 
+/** No app instalado: baixa pacotes novos sozinho ou avisa quando é preciso instalar um APK novo. */
+function verificarAtualizacao() {
+  const plugin = obterPluginDeAtualizacao();
+  if (!plugin) return;
+  const faixa = criarFaixaDeAtualizacao(elemento('faixa-atualizacao'), { local });
+  criarAtualizador({
+    plataforma: criarAtualizacaoNativa(plugin),
+    buscarAnuncio: criarBuscaDeAnuncio(ENDERECO_DO_ANUNCIO_DE_ATUALIZACAO),
+    versaoEmUso: VERSAO_DO_APP,
+    aoPacotePronto: faixa.mostrarPacotePronto,
+    aoApkDisponivel: faixa.mostrarApkDisponivel,
+  }).verificar().catch((erro) => console.warn('Atualização não verificada; tenta de novo na próxima abertura.', erro));
+}
+
 elemento('versao-do-app').textContent = `ContaCerta ${VERSAO_DO_APP}`;
 aplicarPreferencias(preferencias.obter());
 navegacao.abrirTela(preferencias.precisaEscolherModo() ? 'boas-vindas' : 'mes');
 registrarFuncionamentoOffline();
+verificarAtualizacao();

@@ -1,6 +1,8 @@
 // O que vem do aparelho: armazenamento, relógio e funcionamento sem internet.
 
 const CHAVE_DE_TESTE_DO_ARMAZENAMENTO = 'contacerta:teste';
+/** Anúncio da versão mais nova, publicado junto com o site (gerado por npm run publicar-atualizacao). */
+export const ENDERECO_DO_ANUNCIO_DE_ATUALIZACAO = 'https://luizflaviomatias.github.io/contacerta/atualizacao.json';
 
 /** No modo privado do Safari o localStorage pode falhar: aí os dados ficam só em memória. */
 export function obterArmazenamentoDoAparelho() {

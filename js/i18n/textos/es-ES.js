@@ -145,4 +145,10 @@ export default {
   'vencimento.hojeVarias': 'Hoy vencen {n} facturas: {nomes}. Total de {valor}',
   'vencimento.verContas': 'Ver facturas',
   'vencimento.entendi': 'Entendido',
+
+  'atualizacao.titulo': 'Actualización de la app',
+  'atualizacao.pronta': 'La versión {versao} ya se ha descargado y se usará cuando salgas de la app y vuelvas.',
+  'atualizacao.usarAgora': 'Usar ahora',
+  'atualizacao.apk': 'La versión {versao} está disponible. Para recibirla, instala la app actualizada.',
+  'atualizacao.baixarApk': 'Descargar',
 };

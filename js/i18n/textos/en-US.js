@@ -145,4 +145,10 @@ export default {
   'vencimento.hojeVarias': '{n} bills due today: {nomes}. Total {valor}',
   'vencimento.verContas': 'See bills',
   'vencimento.entendi': 'Got it',
+
+  'atualizacao.titulo': 'App update',
+  'atualizacao.pronta': 'Version {versao} has been downloaded and will be used when you leave the app and come back.',
+  'atualizacao.usarAgora': 'Use now',
+  'atualizacao.apk': 'Version {versao} is available. Install the updated app to get it.',
+  'atualizacao.baixarApk': 'Download',
 };

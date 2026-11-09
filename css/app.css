@@ -123,6 +123,18 @@ button:disabled { cursor: default; }
 .botao-icone:active { background: var(--roxo-suave); }
 .botao-icone:disabled { opacity: .35; }
 
+/* Aviso de versão nova */
+.faixa-atualizacao {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 16px; padding: 14px 16px;
+  border-radius: var(--raio); background: var(--roxo-suave); color: var(--texto);
+}
+.faixa-atualizacao__texto { flex: 1 1 220px; margin: 0; }
+.faixa-atualizacao__botao {
+  display: inline-grid; place-items: center; min-height: 44px; padding: 0 18px; border: 0;
+  border-radius: var(--raio-pequeno); background: var(--roxo); color: var(--sobre-roxo);
+  font-weight: 700; text-decoration: none;
+}
+
 /* Aviso das contas que vencem hoje */
 .faixa-vencimentos {
   display: grid; gap: 10px; margin-bottom: 16px; padding: 14px 16px;
