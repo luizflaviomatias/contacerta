@@ -1,6 +1,6 @@
 # ContaCerta
 
-App (PWA) de controle de orçamento para quem recebe o salário em duas vezes no mês.
+App de controle de orçamento, por mês ou por quinzena, em português, espanhol e inglês.
 Funciona em Android e iOS e abre sem internet; os dados ficam salvos no próprio aparelho.
 
 ## Rodar no computador
@@ -32,11 +32,31 @@ npm run apk   # gera ContaCerta-<versão>.apk na raiz do projeto
 
 O APK é de depuração (assinado com a chave de debug): serve para instalar direto no celular,
 permitindo "instalar apps desconhecidos". Para a Play Store é preciso um build de release assinado.
-Para trocar os ícones: `python ferramentas/gerarIcones.py icones android/app/src/main/res`.
+Para trocar os ícones (web, Android e iOS):
+`python ferramentas/gerarIcones.py icones android/app/src/main/res ios/App/App/Assets.xcassets`.
+
+A versão do app fica só no `package.json`: o Android e o iOS leem dela.
+
+## App de iPhone (iOS)
+
+O projeto do Xcode está em `ios/` (Capacitor, com Swift Package Manager). Compilar exige um Mac com Xcode 16 ou mais novo:
+
+```bash
+npm install
+npm run ios:sync      # copia o app para ios/ e leva a versão do package.json para o Xcode
+npx cap open ios      # abre no Xcode
+```
+
+No Xcode: *Signing & Capabilities* → escolha seu *Team* (Apple ID) → selecione o iPhone conectado → ▶︎ Run.
+Com Apple ID gratuito, o app instalado pelo cabo funciona por 7 dias; para TestFlight ou App Store
+é preciso a conta Apple Developer (US$ 99/ano).
+
+Sem Mac, o iPhone usa a versão web: Safari → Compartilhar → *Adicionar à Tela de Início*.
 
 ## Estrutura
 
-- `js/dominio/` — regras puras: dinheiro em centavos, quinzenas, totais, resumo anual.
-- `js/dados/` — preenchimento inicial da planilha e repositório (localStorage injetado).
-- `js/ui/` — seletor de mês, grade das quinzenas, painel anual, janela de lançamento.
+- `js/dominio/` — regras puras: dinheiro em centavos, períodos do mês, totais e relatórios.
+- `js/dados/` — preferências, categorias iniciais da planilha e repositório (localStorage injetado).
+- `js/i18n/` — textos em pt-BR, es-ES e en-US, nomes de meses e formato de dinheiro.
+- `js/ui/` — telas e componentes (grade do mês, relatórios, menu, idiomas, janelas).
 - `js/app.js` — ponto de composição e estado da tela.

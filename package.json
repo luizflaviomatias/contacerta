@@ -8,11 +8,13 @@
     "test": "node --test testes/",
     "www": "node ferramentas/prepararWww.mjs",
     "android:sync": "npm run www && cap sync android",
-    "apk": "npm run android:sync && node ferramentas/gerarApk.mjs"
+    "apk": "npm run android:sync && node ferramentas/gerarApk.mjs",
+    "ios:sync": "npm run www && cap sync ios && node ferramentas/sincronizarVersaoIos.mjs"
   },
   "dependencies": {
     "@capacitor/android": "7.4.4",
-    "@capacitor/core": "7.4.4"
+    "@capacitor/core": "7.4.4",
+    "@capacitor/ios": "^7.4.4"
   },
   "devDependencies": {
     "@capacitor/cli": "7.4.4"
