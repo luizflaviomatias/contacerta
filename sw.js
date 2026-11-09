@@ -13,6 +13,7 @@ const ARQUIVOS_DO_APP = [
   './js/dados/modeloPlanilha.js',
   './js/dados/repositorioOrcamento.js',
   './js/ui/seletorDeMes.js',
+  './js/ui/seletorDeIdioma.js',
   './js/ui/dialogoCopia.js',
   './js/ui/aviso.js',
   './js/ui/dialogoLancamento.js',

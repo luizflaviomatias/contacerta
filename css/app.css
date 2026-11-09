@@ -342,8 +342,30 @@ button:disabled { cursor: default; }
 .escolhas--moeda button { flex-direction: column; gap: 0; min-height: 52px; line-height: 1.2; }
 .escolhas--moeda small { font-size: .8rem; font-weight: 500; }
 
+/* Idioma: bandeira atual no topo e lista só de bandeiras */
+.seletor-de-idioma { position: relative; margin-left: auto; }
+.bandeira { display: block; width: 30px; height: 20px; border-radius: 4px; box-shadow: 0 0 0 1.5px rgb(255 255 255 / .85); }
+.botao-idioma {
+  display: grid; place-items: center; min-width: var(--toque); min-height: var(--toque);
+  border: 0; border-radius: var(--raio-pequeno); background: transparent;
+}
+.botao-idioma:active { background: rgb(255 255 255 / .18); }
+.lista-de-idiomas {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 5;
+  display: grid; gap: 4px; margin: 0; padding: 8px; list-style: none;
+  border-radius: var(--raio); background: var(--superficie); border: 1px solid var(--borda);
+  box-shadow: 0 8px 24px rgb(30 16 64 / .25);
+}
+.opcao-idioma {
+  display: grid; place-items: center; width: 72px; height: 56px;
+  border: 2px solid transparent; border-radius: var(--raio-pequeno); background: transparent;
+}
+.opcao-idioma .bandeira { width: 48px; height: 32px; box-shadow: 0 0 0 1px var(--borda-forte); }
+.opcao-idioma:active { background: var(--campo); }
+.opcao-idioma[aria-current] { border-color: var(--roxo-texto); background: var(--roxo-suave); }
+
 /* Botão do menu (hambúrguer) no topo */
-.botao-menu { margin-left: auto; color: var(--sobre-roxo); }
+.botao-menu { color: var(--sobre-roxo); }
 .botao-menu:active { background: rgb(255 255 255 / .18); }
 
 /* Menu lateral: painel que desliza da direita */

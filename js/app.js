@@ -17,6 +17,7 @@ import { criarMenuLateral } from './ui/menuLateral.js';
 import { criarPainelAnual } from './ui/painelAnual.js';
 import { criarPainelComparacao } from './ui/painelComparacao.js';
 import { criarPainelContasAPagar } from './ui/painelContasAPagar.js';
+import { criarSeletorDeIdioma } from './ui/seletorDeIdioma.js';
 import { criarSeletorDeMes } from './ui/seletorDeMes.js';
 
 const MESES_OFERECIDOS_NA_COPIA = 12;
@@ -69,6 +70,10 @@ const painelAnual = criarPainelAnual(document.getElementById('painel-anual'), { 
 const menuLateral = criarMenuLateral(document.getElementById('menu-lateral'), document.getElementById('botao-menu'), {
   aoEscolherTela: abrirTela,
   aoAlterarPreferencia: alterarPreferencia,
+});
+const seletorDeIdioma = criarSeletorDeIdioma(document.getElementById('seletor-de-idioma'), {
+  local,
+  aoEscolherIdioma: (idioma) => alterarPreferencia('idioma', idioma),
 });
 const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'), { local });
 const dialogoCopia = criarDialogoCopia(document.getElementById('dialogo-copia'), { local });
@@ -246,6 +251,7 @@ function aplicarPreferencias(atuais) {
   document.getElementById('descricao-lancamentos').dataset.i18n = `menu.lancamentos.${modoDeControle()}`;
   aplicarTextosNaPagina(document, local);
   menuLateral.marcarPreferencias(atuais);
+  seletorDeIdioma.renderizar(atuais.idioma);
 }
 
 /** Botões "Voltar para o mês" dentro das telas de relatório. */
