@@ -10,7 +10,11 @@
     "www": "npm run versao && node ferramentas/prepararWww.mjs",
     "android:sync": "npm run www && cap sync android",
     "apk": "npm run android:sync && node ferramentas/gerarApk.mjs",
-    "ios:sync": "npm run www && cap sync ios && node ferramentas/sincronizarVersaoIos.mjs"
+    "ios:sync": "npm run www && cap sync ios && node ferramentas/sincronizarVersaoIos.mjs",
+    "publicar-atualizacao": "npm run www && node ferramentas/publicarAtualizacao.mjs"
+  },
+  "contacerta": {
+    "versaoMinimaDoApk": "3.1.0"
   },
   "dependencies": {
     "@capacitor/android": "7.4.4",

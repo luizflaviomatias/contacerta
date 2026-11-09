@@ -40,6 +40,22 @@ Para trocar os ícones (web, Android e iOS):
 
 A versão do app fica só no `package.json`: o Android e o iOS leem dela.
 
+## Atualização automática (app Android)
+
+O app instalado lê `atualizacao.json` no site e baixa sozinho as telas e regras novas, que entram em uso
+na próxima abertura (plugin Capgo Capacitor Updater, sem servidor da Capgo e sem estatísticas).
+Para publicar uma versão nova sem APK:
+
+```bash
+npm version patch --no-git-tag-version   # ou edite "version" no package.json
+npm run publicar-atualizacao             # gera ContaCerta-web-<versão>.zip e atualizacao.json
+gh release create v<versão> ContaCerta-web-<versão>.zip --latest=false
+git add -A && git commit -m "Versão <versão>" && git push   # publica o atualizacao.json no site
+```
+
+Mudou algo nativo (plugin novo, permissão)? Suba `contacerta.versaoMinimaDoApk` no `package.json`
+e publique também o APK dessa versão: quem tem APK mais antigo vê o aviso para baixar o novo.
+
 ## App de iPhone (iOS)
 
 O projeto do Xcode está em `ios/` (Capacitor, com Swift Package Manager). Compilar exige um Mac com Xcode 16 ou mais novo:
