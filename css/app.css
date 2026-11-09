@@ -367,6 +367,12 @@ button:disabled { cursor: default; }
 }
 .escolhas button .icone { width: 20px; height: 20px; }
 .escolhas button[aria-pressed="true"] { background: var(--roxo); color: var(--sobre-roxo); }
+.preferencia__horario { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; font-weight: 600; }
+.preferencia__horario select {
+  min-height: 44px; padding: 0 12px; border-radius: var(--raio-pequeno); font: inherit;
+  border: 1.5px solid var(--borda-forte); background: var(--superficie); color: var(--texto);
+}
+.preferencia__explicacao { margin: 8px 0 0; color: var(--texto-suave); font-size: .88rem; }
 .escolhas--moeda button { flex-direction: column; gap: 0; min-height: 52px; line-height: 1.2; }
 .escolhas--moeda small { font-size: .8rem; font-weight: 500; }
 

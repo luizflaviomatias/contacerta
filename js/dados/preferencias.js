@@ -5,6 +5,10 @@ import { MODO } from '../dominio/orcamento.js';
 export const TEMA = Object.freeze({ CLARO: 'claro', ESCURO: 'escuro' });
 export const IDIOMA = Object.freeze({ PORTUGUES: 'pt-BR', ESPANHOL: 'es-ES', INGLES: 'en-US' });
 export const MOEDA = Object.freeze({ REAL: 'BRL', EURO: 'EUR', DOLAR: 'USD' });
+/** Avisos de vencimento no celular. Sem valor = a pessoa ainda não respondeu ao convite. */
+export const AVISOS = Object.freeze({ LIGADOS: 'ligados', DESLIGADOS: 'desligados' });
+export const HORARIOS_DOS_AVISOS = Object.freeze(['07:00', '08:00', '09:00', '10:00', '12:00', '18:00', '20:00']);
+const HORARIO_PADRAO_DOS_AVISOS = '09:00';
 
 const CHAVE = 'contacerta:preferencias';
 const IDIOMA_PADRAO = IDIOMA.INGLES;
@@ -46,6 +50,8 @@ export function criarPreferencias({ armazenamento, idiomasDoAparelho, jaUsavaOAp
       tema: TEMA.CLARO,
       idioma,
       moeda: moedaDoIdioma(idioma),
+      avisos: undefined,
+      horarioDosAvisos: HORARIO_PADRAO_DOS_AVISOS,
     };
     gravar(iniciais);
     return iniciais;
@@ -68,6 +74,8 @@ export function criarPreferencias({ armazenamento, idiomasDoAparelho, jaUsavaOAp
       tema: valorValido(salvas.tema, TEMA) ?? TEMA.CLARO,
       idioma,
       moeda: valorValido(salvas.moeda, MOEDA) ?? moedaDoIdioma(idioma),
+      avisos: valorValido(salvas.avisos, AVISOS),
+      horarioDosAvisos: valorValido(salvas.horarioDosAvisos, HORARIOS_DOS_AVISOS) ?? HORARIO_PADRAO_DOS_AVISOS,
     };
   }
 
@@ -85,6 +93,7 @@ export function criarPreferencias({ armazenamento, idiomasDoAparelho, jaUsavaOAp
     obter: () => atuais,
     alterar,
     precisaEscolherModo: () => atuais.modo === undefined,
+    aindaNaoRespondeuSobreAvisos: () => atuais.avisos === undefined,
   };
 }
 

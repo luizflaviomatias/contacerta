@@ -151,4 +151,18 @@ export default {
   'atualizacao.usarAgora': 'Usar agora',
   'atualizacao.apk': 'A versão {versao} está disponível. Para recebê-la, instale o app atualizado.',
   'atualizacao.baixarApk': 'Baixar',
+
+  'notificacao.titulo': 'Contas de hoje',
+  'notificacao.uma': '{nome} — {valor}',
+  'notificacao.varias': '{n} contas: {nomes} — total de {valor}',
+  'notificacao.canal': 'Contas que vencem',
+  'notificacao.semPermissao': 'Para receber os avisos, permita as notificações do ContaCerta nas configurações do celular.',
+  'preferencias.avisos': 'Avisos no celular',
+  'preferencias.avisos.ligados': 'Ligados',
+  'preferencias.avisos.desligados': 'Desligados',
+  'preferencias.avisos.horario': 'Horário do aviso',
+  'preferencias.avisos.explicacao': 'No dia de cada conta, o celular avisa no horário escolhido, mesmo com o app fechado.',
+  'convite.avisos': 'Quer que o celular avise no dia de cada conta? O aviso chega às {horario}, mesmo com o app fechado.',
+  'convite.ligar': 'Ligar avisos',
+  'convite.agoraNao': 'Agora não',
 };

@@ -11,6 +11,10 @@
       "statsUrl": "",
       "resetWhenUpdate": true,
       "appReadyTimeout": 10000
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_contacerta",
+      "iconColor": "#5B2DB5"
     }
   }
 }

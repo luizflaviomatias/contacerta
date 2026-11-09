@@ -151,4 +151,18 @@ export default {
   'atualizacao.usarAgora': 'Use now',
   'atualizacao.apk': 'Version {versao} is available. Install the updated app to get it.',
   'atualizacao.baixarApk': 'Download',
+
+  'notificacao.titulo': 'Bills due today',
+  'notificacao.uma': '{nome} — {valor}',
+  'notificacao.varias': '{n} bills: {nomes} — total {valor}',
+  'notificacao.canal': 'Bills due',
+  'notificacao.semPermissao': 'To get the reminders, allow ContaCerta notifications in your phone settings.',
+  'preferencias.avisos': 'Phone reminders',
+  'preferencias.avisos.ligados': 'On',
+  'preferencias.avisos.desligados': 'Off',
+  'preferencias.avisos.horario': 'Reminder time',
+  'preferencias.avisos.explicacao': 'On the day each bill is due, your phone reminds you at the chosen time, even with the app closed.',
+  'convite.avisos': 'Want your phone to remind you on the day each bill is due? The reminder arrives at {horario}, even with the app closed.',
+  'convite.ligar': 'Turn on reminders',
+  'convite.agoraNao': 'Not now',
 };

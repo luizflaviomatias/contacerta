@@ -27,6 +27,7 @@ export function criarLocalizacao(configuracaoInicial) {
   let regrasDePlural;
   let formatoDoMes;
   let formatoDeLista;
+  let formatoDoHorario;
   let dinheiro;
 
   function configurar(configuracao) {
@@ -35,6 +36,7 @@ export function criarLocalizacao(configuracaoInicial) {
     regrasDePlural = new Intl.PluralRules(idioma);
     formatoDoMes = new Intl.DateTimeFormat(idioma, { month: 'long' });
     formatoDeLista = new Intl.ListFormat(idioma, { style: 'long', type: 'conjunction' });
+    formatoDoHorario = new Intl.DateTimeFormat(idioma, { hour: 'numeric', minute: '2-digit' });
     dinheiro = criarFormatoDeDinheiro(configuracao);
   }
 
@@ -61,6 +63,11 @@ export function criarLocalizacao(configuracaoInicial) {
     mesEAno: ({ ano, mes }) => t('data.mesEAno', { mes: nomeDoMes(mes), ano }),
     /** ['Luz', 'Água', 'Gás'] → "Luz, Água e Gás" no idioma atual. */
     listar: (itens) => formatoDeLista.format(itens),
+    /** "18:00" → "18:00" em português, "6:00 PM" em inglês. */
+    formatarHorario: (horario) => {
+      const [hora, minuto] = horario.split(':').map(Number);
+      return formatoDoHorario.format(new Date(2000, 0, 1, hora, minuto));
+    },
     formatarMoeda: (centavos) => dinheiro.formatarMoeda(centavos),
     formatarParaEdicao: (centavos) => dinheiro.formatarParaEdicao(centavos),
     converterParaCentavos: (texto) => dinheiro.converterParaCentavos(texto),

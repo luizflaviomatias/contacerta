@@ -1,12 +1,13 @@
 // Ponto de composição: cria as dependências, liga telas, ações e preferências, e guarda o estado da tela.
 import { criarAcoesDoMes } from './acoesDoMes.js';
+import { criarAgendadorDeAvisos, criarAgendadorSemNotificacoes } from './agendadorDeAvisos.js';
 import {
   ENDERECO_DO_ANUNCIO_DE_ATUALIZACAO, criarRelogio, gerarId, obterArmazenamentoDoAparelho, registrarFuncionamentoOffline,
 } from './ambiente.js';
 import { criarAtualizador, criarBuscaDeAnuncio } from './atualizador.js';
 import { criarAvisoDispensado } from './dados/avisoDispensado.js';
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
-import { criarPreferencias } from './dados/preferencias.js';
+import { AVISOS, HORARIOS_DOS_AVISOS, criarPreferencias } from './dados/preferencias.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
 import { compararMeses } from './dominio/comparacaoDeMeses.js';
 import { resumirContasAPagar, vencimentosDoDia } from './dominio/contasAPagar.js';
@@ -14,8 +15,10 @@ import { MODO, deslocarMes, periodoDoDia, resumirAno } from './dominio/orcamento
 import { aplicarTextosNaPagina, criarLocalizacao } from './i18n/localizacao.js';
 import { criarNavegacao } from './navegacao.js';
 import { criarAtualizacaoNativa, obterPluginDeAtualizacao } from './plataforma/atualizacaoNativa.js';
+import { criarNotificacoesNativas, obterPluginDeNotificacoes } from './plataforma/notificacoesNativas.js';
 import { criarTratamentoDeErros } from './tratamentoDeErros.js';
 import { criarAviso } from './ui/aviso.js';
+import { criarConviteDeAvisos } from './ui/conviteDeAvisos.js';
 import { criarDialogoConfirmacao } from './ui/dialogoConfirmacao.js';
 import { criarDialogoCopia } from './ui/dialogoCopia.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
@@ -49,6 +52,11 @@ const preferencias = criarPreferencias({
 });
 const local = criarLocalizacao(preferencias.obter());
 const avisoDispensado = criarAvisoDispensado({ armazenamento });
+const pluginDeNotificacoes = obterPluginDeNotificacoes();
+const notificacoes = pluginDeNotificacoes && criarNotificacoesNativas(pluginDeNotificacoes);
+const agendador = notificacoes
+  ? criarAgendadorDeAvisos({ notificacoes, obterMesSalvo: repositorio.obterMesSalvo, agora: relogio.agora, preferencias, local })
+  : criarAgendadorSemNotificacoes();
 
 const estado = {
   ano: hojeNaAbertura.ano,
@@ -61,7 +69,7 @@ const estado = {
 const aviso = criarAviso(elemento('aviso'));
 const confirmacao = criarDialogoConfirmacao(elemento('dialogo-confirmacao'), { local });
 const { proteger } = criarTratamentoDeErros({
-  local, aviso, confirmacao, repositorio, aoRecuperarAno: () => navegacao.renderizarTelaAtual(),
+  local, aviso, confirmacao, repositorio, aoRecuperarAno: () => { navegacao.renderizarTelaAtual(); reagendarAvisos(); },
 });
 const acoes = criarAcoesDoMes({
   repositorio,
@@ -72,14 +80,19 @@ const acoes = criarAcoesDoMes({
   dialogoCopia: criarDialogoCopia(elemento('dialogo-copia'), { local }),
   confirmacao,
   aviso,
-  aoSalvar: () => navegacao.renderizarTelaAtual(),
-  aoDigitarValor: (lancamentos) => grade.atualizarTotais(lancamentos),
+  aoSalvar: () => { navegacao.renderizarTelaAtual(); reagendarAvisos(); },
+  aoDigitarValor: (lancamentos) => { grade.atualizarTotais(lancamentos); reagendarAvisos(); },
 });
 
 const faixaDeVencimentos = criarFaixaDeVencimentos(elemento('faixa-vencimentos'), {
   local,
   aoVerContas: () => { mudarMesSemRedesenhar(relogio.hoje()); navegacao.abrirTela('contas'); },
   aoDispensar: () => { avisoDispensado.dispensarEm(relogio.hoje()); faixaDeVencimentos.esconder(); },
+});
+const conviteDeAvisos = criarConviteDeAvisos(elemento('convite-avisos'), {
+  local,
+  aoLigar: () => { conviteDeAvisos.esconder(); ligarAvisos(); },
+  aoRecusar: () => { conviteDeAvisos.esconder(); alterarPreferencia('avisos', AVISOS.DESLIGADOS); },
 });
 const seletorDeMes = criarSeletorDeMes(elemento('seletor-mes'), {
   local,
@@ -109,7 +122,7 @@ const telaBoasVindas = criarTelaBoasVindas(elemento('tela-boas-vindas'), {
 });
 const menuLateral = criarMenuLateral(elemento('menu-lateral'), elemento('botao-menu'), {
   aoEscolherTela: (nome) => navegacao.abrirTela(nome),
-  aoAlterarPreferencia: alterarPreferencia,
+  aoAlterarPreferencia: (nome, valor) => (nome === 'avisos' && valor === AVISOS.LIGADOS ? ligarAvisos() : alterarPreferencia(nome, valor)),
 });
 const seletorDeIdioma = criarSeletorDeIdioma(elemento('seletor-de-idioma'), {
   local, aoEscolherIdioma: (idioma) => alterarPreferencia('idioma', idioma),
@@ -155,8 +168,15 @@ function renderizarAvisoDeHoje() {
   faixaDeVencimentos.renderizar(vencimentosDoDia(repositorio.obterMes(hoje.ano, hoje.mes), hoje.dia));
 }
 
+/** Só no app instalado, uma vez: convida a ligar os avisos no celular. */
+function renderizarConviteDeAvisos() {
+  if (!notificacoes || !preferencias.aindaNaoRespondeuSobreAvisos()) return conviteDeAvisos.esconder();
+  conviteDeAvisos.renderizar(preferencias.obter().horarioDosAvisos);
+}
+
 function renderizarMes() {
   renderizarAvisoDeHoje();
+  renderizarConviteDeAvisos();
   const hoje = relogio.hoje();
   seletorDeMes.renderizar({
     ano: estado.ano,
@@ -207,6 +227,28 @@ function alterarPreferencia(nome, valor) {
   aplicarPreferencias(preferencias.alterar({ [nome]: valor }));
   if (nome === 'modo') estado.periodo = periodoDoDia(valor, relogio.hoje().dia);
   navegacao.renderizarTelaAtual();
+  reagendarAvisos();
+}
+
+/** Liga os avisos só com a permissão de notificação do celular; sem ela, explica onde permitir. */
+async function ligarAvisos() {
+  const permitido = (await notificacoes.temPermissao()) || (await notificacoes.pedirPermissao());
+  if (!permitido) aviso.mostrar(local.t('notificacao.semPermissao'));
+  alterarPreferencia('avisos', permitido ? AVISOS.LIGADOS : AVISOS.DESLIGADOS);
+}
+
+function reagendarAvisos() {
+  agendador.reagendar().catch((erro) => console.warn('Avisos de vencimento não reagendados.', erro));
+}
+
+function prepararAvisosNoCelular() {
+  if (!notificacoes) return;
+  elemento('preferencia-avisos').hidden = false;
+  const horarios = elemento('horario-dos-avisos');
+  horarios.addEventListener('change', () => alterarPreferencia('horarioDosAvisos', horarios.value));
+  notificacoes.prepararCanal(local.t('notificacao.canal'));
+  notificacoes.aoTocar(({ ano, mes }) => { mudarMesSemRedesenhar({ ano, mes }); navegacao.abrirTela('contas'); });
+  reagendarAvisos();
 }
 
 /** Tema, idioma, moeda e modo valem para a página inteira: textos fixos, topo, menu e tela aberta. */
@@ -219,6 +261,12 @@ function aplicarPreferencias(atuais) {
   menuLateral.marcarPreferencias(atuais);
   seletorDeIdioma.renderizar(atuais.idioma);
   seletorDeModo.renderizar(modoDeControle());
+  renderizarHorariosDosAvisos(atuais.horarioDosAvisos);
+}
+
+function renderizarHorariosDosAvisos(horarioEscolhido) {
+  elemento('horario-dos-avisos').innerHTML = HORARIOS_DOS_AVISOS.map((horario) =>
+    `<option value="${horario}" ${horario === horarioEscolhido ? 'selected' : ''}>${local.formatarHorario(horario)}</option>`).join('');
 }
 
 /** No app instalado: baixa pacotes novos sozinho ou avisa quando é preciso instalar um APK novo. */
@@ -239,4 +287,5 @@ elemento('versao-do-app').textContent = `ContaCerta ${VERSAO_DO_APP}`;
 aplicarPreferencias(preferencias.obter());
 navegacao.abrirTela(preferencias.precisaEscolherModo() ? 'boas-vindas' : 'mes');
 registrarFuncionamentoOffline();
+prepararAvisosNoCelular();
 verificarAtualizacao();

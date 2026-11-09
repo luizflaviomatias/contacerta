@@ -79,11 +79,17 @@ export function criarRepositorioOrcamento({ armazenamento, criarAnoInicial }) {
     }
   }
 
-  return {
-    existeAnoSalvo: (ano) => anosCarregados.has(ano)
+  function existeAnoSalvo(ano) {
+    return anosCarregados.has(ano)
       || armazenamento.getItem(chaveDoAno(ano)) !== null
-      || armazenamento.getItem(chaveAntigaDoAno(ano)) !== null,
+      || armazenamento.getItem(chaveAntigaDoAno(ano)) !== null;
+  }
+
+  return {
+    existeAnoSalvo,
     obterMes: (ano, mes) => obterAno(ano)[mes],
+    /** Como obterMes, mas não cria o ano se ele ainda não existe no aparelho (devolve lista vazia). */
+    obterMesSalvo: (ano, mes) => (existeAnoSalvo(ano) ? obterAno(ano)[mes] : []),
     obterAno,
     salvarMes,
     recomecarAno,

@@ -72,6 +72,7 @@ export function criarAcoesDoMes({
       repositorio.salvarMes(destino.ano, destino.mes, copiarLancamentosParaMes(lancamentosDaOrigem, { origem, destino, gerarId }));
     }
     aviso.mostrar(local.t('copia.concluida', { n: destinos.length }));
+    aoSalvar();
   }
 
   return { lancamentosDoMes, alterarValor, alterarDescricao, marcarPagamento, excluir, incluir, copiarParaMesesSeguintes };

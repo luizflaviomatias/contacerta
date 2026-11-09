@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  IDIOMA, MOEDA, TEMA, criarPreferencias, escolherIdiomaDoAparelho,
+  AVISOS, IDIOMA, MOEDA, TEMA, criarPreferencias, escolherIdiomaDoAparelho,
 } from '../js/dados/preferencias.js';
 import { MODO } from '../js/dominio/orcamento.js';
 
@@ -27,7 +27,7 @@ test('aparelho em outro idioma usa o primeiro idioma conhecido da lista, ou ingl
 
 test('primeira abertura: tema claro, idioma do aparelho e moeda desse idioma', () => {
   assert.deepEqual(novaPessoa(['pt-BR']).obter(), {
-    modo: undefined, tema: TEMA.CLARO, idioma: IDIOMA.PORTUGUES, moeda: MOEDA.REAL,
+    modo: undefined, tema: TEMA.CLARO, idioma: IDIOMA.PORTUGUES, moeda: MOEDA.REAL, avisos: undefined, horarioDosAvisos: '09:00',
   });
   assert.equal(novaPessoa(['es-ES']).obter().moeda, MOEDA.EURO);
   assert.equal(novaPessoa(['it-IT']).obter().moeda, MOEDA.DOLAR);
@@ -69,8 +69,17 @@ test('valor desconhecido ou dados corrompidos voltam ao padrão', () => {
     'contacerta:preferencias': JSON.stringify({ tema: 'rosa', idioma: 'fr-FR', moeda: 'BRL', modo: 'mensal' }),
   });
   assert.deepEqual(novaPessoa(['es-ES'], comValorEstranho).obter(), {
-    modo: MODO.MENSAL, tema: TEMA.CLARO, idioma: IDIOMA.ESPANHOL, moeda: MOEDA.REAL,
+    modo: MODO.MENSAL, tema: TEMA.CLARO, idioma: IDIOMA.ESPANHOL, moeda: MOEDA.REAL, avisos: undefined, horarioDosAvisos: '09:00',
   });
   const corrompido = criarArmazenamentoEmMemoria({ 'contacerta:preferencias': '{quebrado' });
   assert.equal(novaPessoa(['pt-BR'], corrompido).obter().tema, TEMA.CLARO);
+});
+
+test('avisos: a pessoa ainda não respondeu até escolher; horário fora da lista volta para 9h', () => {
+  const preferencias = novaPessoa(['pt-BR']);
+  assert.equal(preferencias.aindaNaoRespondeuSobreAvisos(), true);
+  preferencias.alterar({ avisos: AVISOS.LIGADOS, horarioDosAvisos: '18:00' });
+  assert.equal(preferencias.aindaNaoRespondeuSobreAvisos(), false);
+  assert.equal(preferencias.obter().horarioDosAvisos, '18:00');
+  assert.equal(preferencias.alterar({ horarioDosAvisos: '25:99' }).horarioDosAvisos, '09:00');
 });

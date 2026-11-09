@@ -108,3 +108,10 @@ test('quando existem os dois nomes, vale o nome novo', () => {
   });
   assert.deepEqual(criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio }).obterMes(2026, 0), [gasto]);
 });
+
+test('ler um mês só se o ano já existe não cria o ano', () => {
+  const armazenamento = criarArmazenamentoEmMemoria();
+  const repositorio = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio });
+  assert.deepEqual(repositorio.obterMesSalvo(2027, 0), []);
+  assert.equal(armazenamento.dados.size, 0);
+});

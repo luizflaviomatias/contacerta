@@ -151,4 +151,18 @@ export default {
   'atualizacao.usarAgora': 'Usar ahora',
   'atualizacao.apk': 'La versión {versao} está disponible. Para recibirla, instala la app actualizada.',
   'atualizacao.baixarApk': 'Descargar',
+
+  'notificacao.titulo': 'Facturas de hoy',
+  'notificacao.uma': '{nome} — {valor}',
+  'notificacao.varias': '{n} facturas: {nomes} — total de {valor}',
+  'notificacao.canal': 'Facturas que vencen',
+  'notificacao.semPermissao': 'Para recibir los avisos, permite las notificaciones de ContaCerta en los ajustes del móvil.',
+  'preferencias.avisos': 'Avisos en el móvil',
+  'preferencias.avisos.ligados': 'Activados',
+  'preferencias.avisos.desligados': 'Desactivados',
+  'preferencias.avisos.horario': 'Hora del aviso',
+  'preferencias.avisos.explicacao': 'El día de cada factura, el móvil avisa a la hora elegida, aunque la app esté cerrada.',
+  'convite.avisos': '¿Quieres que el móvil te avise el día de cada factura? El aviso llega a las {horario}, aunque la app esté cerrada.',
+  'convite.ligar': 'Activar avisos',
+  'convite.agoraNao': 'Ahora no',
 };

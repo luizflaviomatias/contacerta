@@ -44,6 +44,7 @@
     <section id="tela-boas-vindas" data-tela-conteudo="boas-vindas" hidden></section>
     <section id="tela-mes" data-tela-conteudo="mes" aria-label="Lançamentos do mês" data-i18n-aria="menu.lancamentos">
       <aside id="faixa-vencimentos" class="faixa-vencimentos" aria-label="Contas de hoje" data-i18n-aria="vencimento.titulo" hidden></aside>
+      <aside id="convite-avisos" class="faixa-vencimentos" aria-label="Avisos no celular" data-i18n-aria="preferencias.avisos" hidden></aside>
       <div id="seletor-mes" class="cartao seletor-mes"></div>
       <div class="cabecalho-mes">
         <h2 id="titulo-mes" class="cabecalho-mes__titulo"></h2>
@@ -126,6 +127,18 @@
           <button type="button" data-preferencia="moeda" data-valor="EUR" aria-pressed="false"><strong>€</strong><small data-i18n="moeda.EUR">Euro</small></button>
           <button type="button" data-preferencia="moeda" data-valor="USD" aria-pressed="false"><strong>US$</strong><small data-i18n="moeda.USD">Dólar</small></button>
         </div>
+      </div>
+      <div class="preferencia" id="preferencia-avisos" role="group" aria-labelledby="rotulo-avisos" hidden>
+        <span class="preferencia__rotulo" id="rotulo-avisos" data-i18n="preferencias.avisos">Avisos no celular</span>
+        <div class="escolhas">
+          <button type="button" data-preferencia="avisos" data-valor="ligados" aria-pressed="false"><span data-i18n="preferencias.avisos.ligados">Ligados</span></button>
+          <button type="button" data-preferencia="avisos" data-valor="desligados" aria-pressed="false"><span data-i18n="preferencias.avisos.desligados">Desligados</span></button>
+        </div>
+        <label class="preferencia__horario">
+          <span data-i18n="preferencias.avisos.horario">Horário do aviso</span>
+          <select id="horario-dos-avisos"></select>
+        </label>
+        <p class="preferencia__explicacao" data-i18n="preferencias.avisos.explicacao"></p>
       </div>
       <p class="menu-lateral__versao" id="versao-do-app"></p>
     </div>

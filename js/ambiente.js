@@ -21,10 +21,18 @@ export function obterArmazenamentoDoAparelho() {
  * @param {() => Date} [lerDataEHora] trocável nos testes
  */
 export function criarRelogio(lerDataEHora = () => new Date()) {
+  function agora() {
+    const momento = lerDataEHora();
+    return {
+      ano: momento.getFullYear(), mes: momento.getMonth(), dia: momento.getDate(),
+      hora: momento.getHours(), minuto: momento.getMinutes(),
+    };
+  }
   return {
+    agora,
     hoje() {
-      const agora = lerDataEHora();
-      return { ano: agora.getFullYear(), mes: agora.getMonth(), dia: agora.getDate() };
+      const { ano, mes, dia } = agora();
+      return { ano, mes, dia };
     },
   };
 }
