@@ -47,6 +47,7 @@ export function criarRepositorioOrcamento({ armazenamento, criarAnoInicial }) {
   }
 
   return {
+    existeAnoSalvo: (ano) => anosCarregados.has(ano) || armazenamento.getItem(chaveDoAno(ano)) !== null,
     obterMes: (ano, mes) => obterAno(ano)[mes],
     obterAno,
     salvarMes,

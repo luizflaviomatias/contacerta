@@ -50,3 +50,13 @@ test('lançamento salvo antes da marca de pago é lido como não pago', () => {
   assert.equal(pago, false);
   assert.equal(lido.pago, false);
 });
+
+test('sabe se um ano já foi salvo antes, sem criá-lo ao perguntar', () => {
+  const armazenamento = criarArmazenamentoEmMemoria();
+  const repositorio = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio });
+
+  assert.equal(repositorio.existeAnoSalvo(2026), false);
+  assert.equal(armazenamento.dados.size, 0);
+  repositorio.obterMes(2026, 0);
+  assert.equal(repositorio.existeAnoSalvo(2026), true);
+});
