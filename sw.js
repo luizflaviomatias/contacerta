@@ -24,6 +24,8 @@ const ARQUIVOS_DO_APP = [
   './js/ui/dialogoCopia.js',
   './js/ui/dialogoConfirmacao.js',
   './js/ui/seletorDeModo.js',
+  './js/ui/faixaDeVencimentos.js',
+  './js/dados/avisoDispensado.js',
   './js/ui/aviso.js',
   './js/ui/dialogoLancamento.js',
   './js/ui/formatacao.js',

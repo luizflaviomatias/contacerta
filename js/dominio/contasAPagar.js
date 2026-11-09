@@ -53,3 +53,12 @@ function ehContaComValor(lancamento) {
 function somarValores(contas) {
   return contas.reduce((soma, conta) => soma + conta.valorCentavos, 0);
 }
+
+/**
+ * Gastos com valor, ainda não pagos, que vencem num dia do mês — o que entra no aviso "hoje vence".
+ * @returns {{ contas: object[], totalCentavos: number }}
+ */
+export function vencimentosDoDia(lancamentosDoMes, dia) {
+  const contas = lancamentosDoMes.filter((lancamento) => ehContaComValor(lancamento) && !lancamento.pago && lancamento.dia === dia);
+  return { contas, totalCentavos: somarValores(contas) };
+}

@@ -26,6 +26,7 @@ export function criarLocalizacao(configuracaoInicial) {
   let textos;
   let regrasDePlural;
   let formatoDoMes;
+  let formatoDeLista;
   let dinheiro;
 
   function configurar(configuracao) {
@@ -33,6 +34,7 @@ export function criarLocalizacao(configuracaoInicial) {
     textos = TEXTOS_POR_IDIOMA[idioma];
     regrasDePlural = new Intl.PluralRules(idioma);
     formatoDoMes = new Intl.DateTimeFormat(idioma, { month: 'long' });
+    formatoDeLista = new Intl.ListFormat(idioma, { style: 'long', type: 'conjunction' });
     dinheiro = criarFormatoDeDinheiro(configuracao);
   }
 
@@ -57,6 +59,8 @@ export function criarLocalizacao(configuracaoInicial) {
     nomeDoMes,
     nomeAbreviadoDoMes: (mes) => nomeDoMes(mes).slice(0, TAMANHO_DO_NOME_ABREVIADO),
     mesEAno: ({ ano, mes }) => t('data.mesEAno', { mes: nomeDoMes(mes), ano }),
+    /** ['Luz', 'Água', 'Gás'] → "Luz, Água e Gás" no idioma atual. */
+    listar: (itens) => formatoDeLista.format(itens),
     formatarMoeda: (centavos) => dinheiro.formatarMoeda(centavos),
     formatarParaEdicao: (centavos) => dinheiro.formatarParaEdicao(centavos),
     converterParaCentavos: (texto) => dinheiro.converterParaCentavos(texto),

@@ -139,4 +139,10 @@ export default {
   'erro.anoCorrompido': 'Os dados de {ano} estão danificados e não puderam ser abertos. Quer recomeçar {ano} do zero? Uma cópia dos dados antigos fica guardada no aparelho.',
   'erro.recomecarAno': 'Recomeçar {ano}',
   'erro.anoIndisponivel': 'Os dados de {ano} não puderam ser abertos.',
+
+  'vencimento.titulo': 'Contas de hoje',
+  'vencimento.hojeUma': 'Hoje vence: {nome} — {valor}',
+  'vencimento.hojeVarias': 'Hoje vencem {n} contas: {nomes}. Total de {valor}',
+  'vencimento.verContas': 'Ver contas',
+  'vencimento.entendi': 'Entendi',
 };

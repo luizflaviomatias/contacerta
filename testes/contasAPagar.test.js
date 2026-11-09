@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { SITUACAO, resumirContasAPagar, situacaoDaConta } from '../js/dominio/contasAPagar.js';
+import { SITUACAO, resumirContasAPagar, situacaoDaConta, vencimentosDoDia } from '../js/dominio/contasAPagar.js';
 import { TIPO, criarLancamento, deslocarMes } from '../js/dominio/orcamento.js';
 
 const NOVEMBRO_2026 = { ano: 2026, mes: 10 };
@@ -63,4 +63,19 @@ test('gasto ainda sem valor não aparece como conta em aberto', () => {
   const resumo = resumirContasAPagar([conta(5, { valorCentavos: 0 }), conta(6)], NOVEMBRO_2026, HOJE);
   assert.equal(resumo.quantidadeEmAberto, 1);
   assert.deepEqual(resumo.grupos.flatMap((grupo) => grupo.contas).map((item) => item.dia), [6]);
+});
+
+test('vencimentos do dia: só gastos com valor, não pagos, daquele dia', () => {
+  const salario = criarLancamento({ id: 's', descricao: 'Salário', tipo: TIPO.RECEITA, valorCentavos: 100, dia: 10 });
+  const lista = [salario, conta(10, { valorCentavos: 3000 }), conta(10, { valorCentavos: 2000, descricao: 'Água' }),
+    conta(10, { pago: true }), conta(10, { valorCentavos: 0, descricao: 'Sem valor' }), conta(11)];
+
+  const { contas, totalCentavos } = vencimentosDoDia(lista, 10);
+
+  assert.deepEqual(contas.map((item) => item.descricao), ['Conta dia 10', 'Água']);
+  assert.equal(totalCentavos, 5000);
+});
+
+test('dia sem contas não tem vencimentos', () => {
+  assert.deepEqual(vencimentosDoDia([conta(3)], 4), { contas: [], totalCentavos: 0 });
 });

@@ -123,6 +123,20 @@ button:disabled { cursor: default; }
 .botao-icone:active { background: var(--roxo-suave); }
 .botao-icone:disabled { opacity: .35; }
 
+/* Aviso das contas que vencem hoje */
+.faixa-vencimentos {
+  display: grid; gap: 10px; margin-bottom: 16px; padding: 14px 16px;
+  border-radius: var(--raio); background: var(--superficie); box-shadow: inset 5px 0 0 var(--destaque), var(--sombra);
+  border: 1px solid var(--borda);
+}
+.faixa-vencimentos__texto { margin: 0; font-size: 1.05rem; line-height: 1.4; }
+.faixa-vencimentos__acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.faixa-vencimentos__ver, .faixa-vencimentos__dispensar {
+  min-height: 44px; padding: 0 18px; border-radius: var(--raio-pequeno); font-weight: 700; border: 0;
+}
+.faixa-vencimentos__ver { background: var(--destaque); color: var(--sobre-destaque); }
+.faixa-vencimentos__dispensar { background: var(--campo); color: var(--texto); }
+
 /* Seletor de mês: cartão roxo */
 .seletor-mes { background: var(--roxo); border-color: transparent; color: var(--sobre-roxo); }
 .seletor-mes .botao-icone { color: var(--sobre-roxo); }

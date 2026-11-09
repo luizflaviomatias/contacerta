@@ -3,11 +3,12 @@ import { criarAcoesDoMes } from './acoesDoMes.js';
 import {
   criarRelogio, gerarId, obterArmazenamentoDoAparelho, registrarFuncionamentoOffline,
 } from './ambiente.js';
+import { criarAvisoDispensado } from './dados/avisoDispensado.js';
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
 import { criarPreferencias } from './dados/preferencias.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
 import { compararMeses } from './dominio/comparacaoDeMeses.js';
-import { resumirContasAPagar } from './dominio/contasAPagar.js';
+import { resumirContasAPagar, vencimentosDoDia } from './dominio/contasAPagar.js';
 import { MODO, deslocarMes, periodoDoDia, resumirAno } from './dominio/orcamento.js';
 import { aplicarTextosNaPagina, criarLocalizacao } from './i18n/localizacao.js';
 import { criarNavegacao } from './navegacao.js';
@@ -16,6 +17,7 @@ import { criarAviso } from './ui/aviso.js';
 import { criarDialogoConfirmacao } from './ui/dialogoConfirmacao.js';
 import { criarDialogoCopia } from './ui/dialogoCopia.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
+import { criarFaixaDeVencimentos } from './ui/faixaDeVencimentos.js';
 import { criarGradeDoMes } from './ui/gradeDoMes.js';
 import { criarMenuLateral } from './ui/menuLateral.js';
 import { criarPainelAnual } from './ui/painelAnual.js';
@@ -43,6 +45,7 @@ const preferencias = criarPreferencias({
   jaUsavaOApp: repositorio.existeAnoSalvo(hojeNaAbertura.ano) || repositorio.existeAnoSalvo(hojeNaAbertura.ano - 1),
 });
 const local = criarLocalizacao(preferencias.obter());
+const avisoDispensado = criarAvisoDispensado({ armazenamento });
 
 const estado = {
   ano: hojeNaAbertura.ano,
@@ -70,6 +73,11 @@ const acoes = criarAcoesDoMes({
   aoDigitarValor: (lancamentos) => grade.atualizarTotais(lancamentos),
 });
 
+const faixaDeVencimentos = criarFaixaDeVencimentos(elemento('faixa-vencimentos'), {
+  local,
+  aoVerContas: () => { mudarMesSemRedesenhar(relogio.hoje()); navegacao.abrirTela('contas'); },
+  aoDispensar: () => { avisoDispensado.dispensarEm(relogio.hoje()); faixaDeVencimentos.esconder(); },
+});
 const seletorDeMes = criarSeletorDeMes(elemento('seletor-mes'), {
   local,
   aoSelecionarMes: proteger((mes) => mudarMes({ mes })),
@@ -137,7 +145,15 @@ function modeloDoAnoNovo() {
   return { idioma: preferencias.obter().idioma, modo: modoDeControle() };
 }
 
+/** O aviso é sempre sobre hoje, qualquer que seja o mês aberto na tela. */
+function renderizarAvisoDeHoje() {
+  const hoje = relogio.hoje();
+  if (avisoDispensado.foiDispensadoEm(hoje)) return faixaDeVencimentos.esconder();
+  faixaDeVencimentos.renderizar(vencimentosDoDia(repositorio.obterMes(hoje.ano, hoje.mes), hoje.dia));
+}
+
 function renderizarMes() {
+  renderizarAvisoDeHoje();
   const hoje = relogio.hoje();
   seletorDeMes.renderizar({
     ano: estado.ano,
@@ -171,8 +187,12 @@ function renderizarPainelAnual() {
 }
 
 function mudarMes(alteracao) {
-  Object.assign(estado, alteracao);
+  mudarMesSemRedesenhar(alteracao);
   navegacao.renderizarTelaAtual();
+}
+
+function mudarMesSemRedesenhar({ ano = estado.ano, mes = estado.mes }) {
+  Object.assign(estado, { ano, mes });
 }
 
 function deslocarMesAberto(deslocamento) {

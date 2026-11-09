@@ -139,4 +139,10 @@ export default {
   'erro.anoCorrompido': 'The data for {ano} is damaged and could not be opened. Start {ano} over? A copy of the old data is kept on the device.',
   'erro.recomecarAno': 'Start {ano} over',
   'erro.anoIndisponivel': 'The data for {ano} could not be opened.',
+
+  'vencimento.titulo': 'Bills due today',
+  'vencimento.hojeUma': 'Due today: {nome} — {valor}',
+  'vencimento.hojeVarias': '{n} bills due today: {nomes}. Total {valor}',
+  'vencimento.verContas': 'See bills',
+  'vencimento.entendi': 'Got it',
 };
