@@ -1,7 +1,7 @@
 import { SITUACAO } from '../dominio/contasAPagar.js';
 import { formatarMoeda } from '../dominio/dinheiro.js';
+import { cabecalhoDePeriodo, ouvirTrocaDePeriodo } from './cabecalhoDePeriodo.js';
 import { escaparHtml, nomeDoMes } from './formatacao.js';
-import { ICONE } from './icones.js';
 
 const TITULO_DO_GRUPO = {
   [SITUACAO.ATRASADA]: 'Atrasadas',
@@ -19,11 +19,7 @@ const DESCREVER_VENCIMENTO = {
 
 /** Aba "A pagar": quanto falta pagar no mês e as contas por situação, marcáveis como pagas. */
 export function criarPainelContasAPagar(container, { aoTrocarMes, aoMarcarPagamento }) {
-  container.addEventListener('click', (evento) => {
-    const botao = evento.target.closest('button[data-acao]');
-    if (botao?.dataset.acao === 'mes-anterior') aoTrocarMes(-1);
-    if (botao?.dataset.acao === 'mes-seguinte') aoTrocarMes(+1);
-  });
+  ouvirTrocaDePeriodo(container, aoTrocarMes);
   container.addEventListener('change', (evento) => {
     const caixa = evento.target;
     if (caixa.matches('.campo-pago')) aoMarcarPagamento(caixa.closest('[data-id]').dataset.id, caixa.checked);
@@ -31,11 +27,9 @@ export function criarPainelContasAPagar(container, { aoTrocarMes, aoMarcarPagame
 
   function renderizar({ ano, mes, resumo }) {
     container.innerHTML = `
-      <div class="seletor-mes__cabecalho">
-        <button class="botao-icone" data-acao="mes-anterior" aria-label="Mês anterior">${ICONE.anterior}</button>
-        <h2 class="seletor-mes__titulo">${nomeDoMes(mes)} de ${ano}</h2>
-        <button class="botao-icone" data-acao="mes-seguinte" aria-label="Próximo mês">${ICONE.seguinte}</button>
-      </div>
+      ${cabecalhoDePeriodo({
+        titulo: `${nomeDoMes(mes)} de ${ano}`, rotuloAnterior: 'Mês anterior', rotuloSeguinte: 'Próximo mês',
+      })}
       ${resumoDoMes(resumo)}
       ${resumo.grupos.length === 0
         ? '<p class="cartao lista-vazia">Nenhuma conta com valor neste mês.</p>'

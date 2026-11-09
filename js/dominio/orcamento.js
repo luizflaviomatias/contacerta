@@ -152,7 +152,8 @@ function somar(valores) {
   return valores.reduce((soma, valor) => soma + valor, 0);
 }
 
-function agruparGastosPorCategoria(lancamentos) {
+/** Soma dos gastos por descrição, do maior para o menor; gastos sem valor ficam de fora. */
+export function agruparGastosPorCategoria(lancamentos) {
   const totais = new Map();
   for (const { tipo, descricao, valorCentavos } of lancamentos) {
     if (tipo !== TIPO.DESPESA || valorCentavos === 0) continue;

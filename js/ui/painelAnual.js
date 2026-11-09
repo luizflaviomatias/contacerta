@@ -1,22 +1,14 @@
 import { formatarMoeda } from '../dominio/dinheiro.js';
+import { cabecalhoDePeriodo, ouvirTrocaDePeriodo } from './cabecalhoDePeriodo.js';
 import { escaparHtml, nomeDoMes } from './formatacao.js';
-import { ICONE } from './icones.js';
 
 /** Aba anual em "big numbers". */
 export function criarPainelAnual(container, { aoTrocarAno }) {
-  container.addEventListener('click', (evento) => {
-    const botao = evento.target.closest('button[data-acao]');
-    if (botao?.dataset.acao === 'ano-anterior') aoTrocarAno(-1);
-    if (botao?.dataset.acao === 'ano-seguinte') aoTrocarAno(+1);
-  });
+  ouvirTrocaDePeriodo(container, aoTrocarAno);
 
   function renderizar({ ano, resumo }) {
     container.innerHTML = `
-      <div class="seletor-mes__cabecalho">
-        <button class="botao-icone" data-acao="ano-anterior" aria-label="Ano anterior">${ICONE.anterior}</button>
-        <h2 class="seletor-mes__titulo">Visão anual ${ano}</h2>
-        <button class="botao-icone" data-acao="ano-seguinte" aria-label="Próximo ano">${ICONE.seguinte}</button>
-      </div>
+      ${cabecalhoDePeriodo({ titulo: `Resumo do ano ${ano}`, rotuloAnterior: 'Ano anterior', rotuloSeguinte: 'Próximo ano' })}
       <div class="big-numbers">
         ${numeroGrande('Gasto no ano', formatarMoeda(resumo.gasto), 'destaque')}
         ${numeroGrande('Recebido no ano', formatarMoeda(resumo.recebido))}

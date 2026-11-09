@@ -1,6 +1,7 @@
 // Ponto de composição: cria as dependências, liga a interface às regras e guarda o estado da tela.
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
+import { compararMeses } from './dominio/comparacaoDeMeses.js';
 import { resumirContasAPagar } from './dominio/contasAPagar.js';
 import {
   ErroLancamentoInvalido, adicionarLancamento, alterarLancamento, copiarLancamentosParaMes, criarLancamento,
@@ -9,10 +10,12 @@ import {
 import { criarAviso } from './ui/aviso.js';
 import { criarDialogoCopia } from './ui/dialogoCopia.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
-import { criarGradeQuinzenas } from './ui/gradeQuinzenas.js';
-import { criarPainelAnual } from './ui/painelAnual.js';
-import { criarPainelContasAPagar } from './ui/painelContasAPagar.js';
 import { nomeDoMes } from './ui/formatacao.js';
+import { criarGradeQuinzenas } from './ui/gradeQuinzenas.js';
+import { criarMenuLateral } from './ui/menuLateral.js';
+import { criarPainelAnual } from './ui/painelAnual.js';
+import { criarPainelComparacao } from './ui/painelComparacao.js';
+import { criarPainelContasAPagar } from './ui/painelContasAPagar.js';
 import { criarSeletorDeMes } from './ui/seletorDeMes.js';
 
 const MESES_OFERECIDOS_NA_COPIA = 12;
@@ -23,6 +26,7 @@ const estado = {
   mes: hoje.getMonth(),
   quinzena: quinzenaDoDia(hoje.getDate()),
   anoDoPainel: hoje.getFullYear(),
+  tela: 'mes',
 };
 
 const repositorio = criarRepositorioOrcamento({
@@ -43,8 +47,14 @@ const grade = criarGradeQuinzenas(document.getElementById('quinzenas'), {
   aoTrocarQuinzena: trocarQuinzena,
 });
 const painelContas = criarPainelContasAPagar(document.getElementById('painel-contas'), {
-  aoTrocarMes: trocarMesDasContas,
+  aoTrocarMes: trocarMesNaTela,
   aoMarcarPagamento: marcarPagamento,
+});
+const painelComparacao = criarPainelComparacao(document.getElementById('painel-comparacao'), {
+  aoTrocarMes: trocarMesNaTela,
+});
+const menuLateral = criarMenuLateral(document.getElementById('menu-lateral'), document.getElementById('botao-menu'), {
+  aoEscolherTela: abrirTela,
 });
 const painelAnual = criarPainelAnual(document.getElementById('painel-anual'), { aoTrocarAno: trocarAnoDoPainel });
 const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'));
@@ -105,9 +115,16 @@ function renderizarContas() {
   painelContas.renderizar({ ...mesAberto, resumo: resumirContasAPagar(lancamentosDoMes(), mesAberto, hojeNoCalendario) });
 }
 
-function trocarMesDasContas(deslocamento) {
+function renderizarComparacao() {
+  const mes = { ano: estado.ano, mes: estado.mes };
+  const mesAnterior = deslocarMes(mes, -1);
+  const comparacao = compararMeses(lancamentosDoMes(), repositorio.obterMes(mesAnterior.ano, mesAnterior.mes));
+  painelComparacao.renderizar({ mes, mesAnterior, comparacao });
+}
+
+function trocarMesNaTela(deslocamento) {
   Object.assign(estado, deslocarMes(estado, deslocamento));
-  renderizarContas();
+  renderizarTelaAtual();
 }
 
 function renderizarPainelAnual() {
@@ -140,11 +157,10 @@ function atualizarLancamento(id, alteracoes) {
   }
 }
 
-/** Redesenha as telas do mês: marcar ou desmarcar trava a linha e muda o que falta pagar. */
+/** Marcar ou desmarcar trava a linha e muda o que falta pagar: a tela aberta é redesenhada. */
 function marcarPagamento(id, pago) {
   salvarMes(alterarLancamento(lancamentosDoMes(), id, { pago }));
-  renderizarMes();
-  renderizarContas();
+  renderizarTelaAtual();
 }
 
 function excluirLancamento(id) {
@@ -170,29 +186,35 @@ async function incluirLancamento(tipo, quinzena) {
   }
 }
 
-/** Cada aba se redesenha ao abrir, porque o mês pode ter mudado em outra aba. */
-const ABRIR_ABA = {
+/** Cada tela se redesenha ao abrir, porque o mês pode ter mudado em outra. */
+const RENDERIZAR_TELA = {
   mes: renderizarMes,
   contas: renderizarContas,
-  anual: () => {
-    estado.anoDoPainel = estado.ano;
-    renderizarPainelAnual();
-  },
+  comparacao: renderizarComparacao,
+  anual: renderizarPainelAnual,
 };
 
-function configurarAbas() {
-  const botoes = document.querySelectorAll('[data-aba]');
-  for (const botao of botoes) {
-    botao.addEventListener('click', () => {
-      for (const outro of botoes) {
-        const ativo = outro === botao;
-        outro.setAttribute('aria-selected', String(ativo));
-        document.getElementById(outro.getAttribute('aria-controls')).hidden = !ativo;
-      }
-      ABRIR_ABA[botao.dataset.aba]();
-      window.scrollTo(0, 0);
-    });
+function abrirTela(nome) {
+  if (nome === 'anual') estado.anoDoPainel = estado.ano;
+  estado.tela = nome;
+  for (const secao of document.querySelectorAll('[data-tela-conteudo]')) {
+    secao.hidden = secao.dataset.telaConteudo !== nome;
   }
+  menuLateral.marcarTelaAtual(nome);
+  renderizarTelaAtual();
+  window.scrollTo(0, 0);
+}
+
+function renderizarTelaAtual() {
+  RENDERIZAR_TELA[estado.tela]();
+}
+
+/** Botões "Voltar para o mês" dentro das telas de relatório. */
+function ouvirBotoesDeVoltar() {
+  document.querySelector('.conteudo').addEventListener('click', (evento) => {
+    const botao = evento.target.closest('.botao-voltar[data-tela]');
+    if (botao) abrirTela(botao.dataset.tela);
+  });
 }
 
 function gerarId() {
@@ -218,6 +240,6 @@ function registrarFuncionamentoOffline() {
   if (!ehAppNativo && 'serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 }
 
-configurarAbas();
-renderizarMes();
+ouvirBotoesDeVoltar();
+abrirTela('mes');
 registrarFuncionamentoOffline();

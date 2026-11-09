@@ -1,5 +1,5 @@
 // Deixa o app abrir sem internet. Ao publicar uma nova versão, troque VERSAO_DO_CACHE.
-const VERSAO_DO_CACHE = 'orcamento-quinzenal-v6';
+const VERSAO_DO_CACHE = 'orcamento-quinzenal-v7';
 const ARQUIVOS_DO_APP = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ARQUIVOS_DO_APP = [
   './js/dominio/dinheiro.js',
   './js/dominio/orcamento.js',
   './js/dominio/contasAPagar.js',
+  './js/dominio/comparacaoDeMeses.js',
   './js/dados/modeloPlanilha.js',
   './js/dados/repositorioOrcamento.js',
   './js/ui/seletorDeMes.js',
@@ -20,6 +21,9 @@ const ARQUIVOS_DO_APP = [
   './js/ui/icones.js',
   './js/ui/painelAnual.js',
   './js/ui/painelContasAPagar.js',
+  './js/ui/painelComparacao.js',
+  './js/ui/cabecalhoDePeriodo.js',
+  './js/ui/menuLateral.js',
   './icones/icone-180.png',
   './icones/icone-192.png',
   './icones/icone-512.png',
