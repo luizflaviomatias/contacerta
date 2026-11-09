@@ -3,6 +3,9 @@
 App de controle de orçamento, por mês ou por quinzena, em português, espanhol e inglês.
 Funciona em Android e iOS e abre sem internet; os dados ficam salvos no próprio aparelho.
 
+Página de apresentação, com a documentação de uso e os links para baixar: `sobre/index.html`
+(publicada em https://luizflaviomatias.github.io/orcamento-quinzenal/sobre/).
+
 ## Rodar no computador
 
 ```bash

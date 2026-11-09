@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ContaCerta — orçamento simples, por mês ou por quinzena</title>
+  <meta name="description" content="ContaCerta: app gratuito para controlar o dinheiro do mês ou da quinzena. Funciona sem internet, em português, espanhol e inglês. Baixe para Android ou use no iPhone.">
+  <meta name="theme-color" content="#5b2db5">
+  <link rel="icon" href="../icones/icone-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="../icones/icone-180.png">
+  <style>
+    :root {
+      --fundo: #f7f6fa;
+      --superficie: #ffffff;
+      --texto: #1e1a2b;
+      --texto-suave: #5d5770;
+      --borda: #e7e4ef;
+      --campo: #f3f1f8;
+      --roxo: #5b2db5;
+      --roxo-escuro: #45208e;
+      --roxo-texto: #5b2db5;
+      --roxo-suave: #efe9fb;
+      --sobre-roxo: #ffffff;
+      --sobre-roxo-suave: #ddd2f7;
+      --destaque: #ffb020;
+      --sobre-destaque: #2b1a00;
+      --receita: #15803d;
+      --despesa: #be185d;
+      --negativo: #b91c1c;
+      --raio: 18px;
+      --sombra: 0 1px 2px rgb(30 26 43 / .05), 0 8px 24px rgb(30 26 43 / .07);
+      --largura: 1080px;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fundo: #14111d;
+        --superficie: #1d1929;
+        --texto: #ece8f6;
+        --texto-suave: #aaa3bf;
+        --borda: #2e2940;
+        --campo: #252036;
+        --roxo: #4f2fa8;
+        --roxo-escuro: #3a2280;
+        --roxo-texto: #bba5ff;
+        --roxo-suave: #2c2448;
+        --destaque: #ffb84d;
+        --receita: #5bd08a;
+        --despesa: #ff7eb0;
+        --negativo: #ff7b7b;
+        --sombra: none;
+        color-scheme: dark;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    body {
+      margin: 0; background: var(--fundo); color: var(--texto);
+      font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    a { color: var(--roxo-texto); }
+    img, svg { display: block; }
+    .conteiner { width: min(100% - 32px, var(--largura)); margin-inline: auto; }
+    .icone { width: 24px; height: 24px; flex: none; }
+    :focus-visible { outline: 3px solid var(--destaque); outline-offset: 3px; border-radius: 6px; }
+
+    /* Topo fixo */
+    .barra {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--roxo); color: var(--sobre-roxo);
+    }
+    .barra .conteiner { display: flex; align-items: center; gap: 12px; min-height: 64px; }
+    .marca { display: flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; font-weight: 800; font-size: 1.15rem; }
+    .marca img { width: 36px; height: 36px; border-radius: 10px; box-shadow: 0 0 0 2px rgb(255 255 255 / .45); }
+    .barra nav { margin-left: auto; display: flex; gap: 4px; }
+    .barra nav a {
+      color: var(--sobre-roxo-suave); text-decoration: none; font-weight: 600; font-size: .95rem;
+      padding: 10px 12px; border-radius: 10px;
+    }
+    .barra nav a:hover { background: rgb(255 255 255 / .12); color: var(--sobre-roxo); }
+    @media (max-width: 720px) { .barra nav .opcional { display: none; } }
+
+    /* Abertura */
+    .abertura { background: var(--roxo); color: var(--sobre-roxo); padding: 40px 0 72px; overflow: hidden; }
+    .abertura .conteiner { display: grid; gap: 40px; align-items: center; }
+    @media (min-width: 880px) { .abertura .conteiner { grid-template-columns: 1.1fr .9fr; } }
+    .selo {
+      display: inline-flex; gap: 8px; align-items: center; margin: 0 0 16px;
+      padding: 6px 12px; border-radius: 999px; background: rgb(255 255 255 / .14);
+      font-size: .9rem; font-weight: 600; color: var(--sobre-roxo-suave);
+    }
+    .abertura h1 { margin: 0 0 16px; font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1.12; letter-spacing: -.02em; }
+    .abertura h1 em { font-style: normal; color: var(--destaque); }
+    .abertura p.chamada { margin: 0 0 28px; font-size: 1.15rem; color: var(--sobre-roxo-suave); max-width: 34em; }
+    .acoes { display: flex; flex-wrap: wrap; gap: 12px; }
+    .botao {
+      display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 22px;
+      border-radius: 14px; font-weight: 800; font-size: 1.05rem; text-decoration: none;
+    }
+    .botao--principal { background: var(--destaque); color: var(--sobre-destaque); box-shadow: 0 6px 18px rgb(0 0 0 / .18); }
+    .botao--principal:hover { filter: brightness(1.05); }
+    .botao--claro { background: rgb(255 255 255 / .14); color: var(--sobre-roxo); }
+    .botao--claro:hover { background: rgb(255 255 255 / .22); }
+    .botao small { display: block; font-weight: 600; font-size: .78rem; opacity: .8; line-height: 1.1; }
+    .botao span { line-height: 1.15; }
+    .nota-abertura { margin: 18px 0 0; font-size: .92rem; color: var(--sobre-roxo-suave); }
+
+    /* Celular ilustrativo (desenhado em HTML, não é captura de tela) */
+    .celular {
+      width: min(300px, 82vw); margin-inline: auto; padding: 12px; border-radius: 42px;
+      background: #120c24; box-shadow: 0 30px 60px rgb(0 0 0 / .35); transform: rotate(-2deg);
+    }
+    .tela {
+      border-radius: 32px; overflow: hidden; background: #f7f6fa; color: #1e1a2b;
+      font-size: 11px; line-height: 1.3;
+    }
+    .tela__topo { display: flex; align-items: center; gap: 6px; padding: 14px 12px 10px; background: #5b2db5; color: #fff; font-weight: 800; }
+    .tela__topo i { width: 18px; height: 18px; border-radius: 5px; background: #ffb020; }
+    .tela__topo b { margin-left: auto; font-size: 10px; opacity: .85; }
+    .tela__bandeira {
+      width: 16px; height: 11px; border-radius: 2px; box-shadow: 0 0 0 1px rgb(255 255 255 / .8);
+      background: radial-gradient(circle at 50% 50%, #002776 0 2.4px, transparent 2.6px),
+                  linear-gradient(135deg, transparent 30%, #ffdf00 30% 70%, transparent 70%) center / 70% 100% no-repeat,
+                  linear-gradient(45deg, transparent 30%, #ffdf00 30% 70%, transparent 70%) center / 70% 100% no-repeat,
+                  #009c3b;
+    }
+    .tela__meses { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 10px; padding: 8px; border-radius: 12px; background: #5b2db5; }
+    .tela__meses span { padding: 5px 0; border-radius: 6px; background: rgb(255 255 255 / .14); color: #fff; text-align: center; font-weight: 700; font-size: 9px; }
+    .tela__meses .ativo { background: #ffb020; color: #2b1a00; }
+    .tela__cartao { margin: 0 10px 10px; padding: 10px; border-radius: 12px; background: #fff; box-shadow: 0 1px 4px rgb(0 0 0 / .06); }
+    .tela__cartao h4 { margin: 0 0 6px; color: #5b2db5; font-size: 11px; }
+    .tela__linha { display: grid; grid-template-columns: 14px 1fr auto; gap: 6px; align-items: center; padding: 5px 0; border-top: 1px solid #eee; }
+    .tela__linha:first-of-type { border-top: 0; }
+    .tela__linha i { width: 12px; height: 12px; border-radius: 4px; border: 1.5px solid #cdc7da; }
+    .tela__linha.paga i { background: #15803d; border-color: #15803d; }
+    .tela__linha.paga span, .tela__linha.paga b { text-decoration: line-through; opacity: .5; }
+    .tela__linha b { font-variant-numeric: tabular-nums; }
+    .tela__resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 0 10px 14px; padding: 8px; border-radius: 12px; background: #5b2db5; color: #fff; }
+    .tela__resumo small { display: block; color: #ddd2f7; font-size: 8px; }
+    .tela__resumo b { font-size: 10px; }
+
+    /* Seções */
+    section { padding: 64px 0; }
+    .titulo-secao { margin: 0 0 8px; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; letter-spacing: -.01em; }
+    .subtitulo-secao { margin: 0 0 32px; color: var(--texto-suave); font-size: 1.08rem; max-width: 40em; }
+    .grade { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+    .cartao {
+      padding: 22px; border-radius: var(--raio); background: var(--superficie);
+      border: 1px solid var(--borda); box-shadow: var(--sombra);
+    }
+    .cartao h3 { margin: 12px 0 6px; font-size: 1.12rem; }
+    .cartao p { margin: 0; color: var(--texto-suave); }
+    .cartao .icone-grande {
+      display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px;
+      background: var(--roxo-suave); color: var(--roxo-texto);
+    }
+
+    /* Mensal × quinzenal */
+    .modos { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+    .modo { padding: 26px; border-radius: var(--raio); background: var(--superficie); border: 2px solid var(--borda); }
+    .modo h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 1.25rem; }
+    .modo ul { margin: 12px 0 0; padding-left: 20px; color: var(--texto-suave); }
+    .modo li + li { margin-top: 6px; }
+    .dica {
+      display: flex; gap: 12px; margin-top: 20px; padding: 16px 18px; border-radius: 14px;
+      background: var(--roxo-suave); color: var(--texto);
+    }
+    .dica .icone { color: var(--roxo-texto); margin-top: 2px; }
+
+    /* Passo a passo */
+    .passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: passo; }
+    .passos li {
+      counter-increment: passo; display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start;
+      padding: 18px; border-radius: var(--raio); background: var(--superficie); border: 1px solid var(--borda);
+    }
+    .passos li::before {
+      content: counter(passo); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+      background: var(--roxo); color: var(--sobre-roxo); font-weight: 800; font-size: 1.1rem;
+    }
+    .passos strong { display: block; font-size: 1.05rem; }
+    .passos span { color: var(--texto-suave); }
+
+    /* Relatórios */
+    .relatorio { display: grid; gap: 6px; }
+    .relatorio .rotulo { font-size: .8rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--roxo-texto); }
+
+    /* Download */
+    .download { background: var(--roxo); color: var(--sobre-roxo); }
+    .download .subtitulo-secao { color: var(--sobre-roxo-suave); }
+    .plataformas { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); }
+    .plataforma {
+      display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: var(--raio);
+      background: var(--superficie); color: var(--texto);
+    }
+    .plataforma h3 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.25rem; }
+    .plataforma ol { margin: 0; padding-left: 22px; color: var(--texto-suave); }
+    .plataforma ol li + li { margin-top: 4px; }
+    .plataforma .botao { margin-top: auto; align-self: flex-start; }
+    .plataforma .botao--roxo { background: var(--roxo); color: var(--sobre-roxo); }
+    .detalhe-download { margin: 0; font-size: .9rem; color: var(--texto-suave); }
+
+    /* Perguntas */
+    .perguntas { display: grid; gap: 10px; }
+    details { border-radius: 14px; background: var(--superficie); border: 1px solid var(--borda); }
+    summary {
+      cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px;
+      padding: 18px 20px; font-weight: 700; font-size: 1.05rem;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--roxo-texto); font-size: 1.4rem; line-height: 1; }
+    details[open] summary::after { content: "−"; }
+    details p { margin: 0; padding: 0 20px 18px; color: var(--texto-suave); }
+
+    .tabela-cores { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .cor { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: var(--superficie); border: 1px solid var(--borda); font-weight: 600; font-size: .95rem; }
+    .cor i { width: 14px; height: 14px; border-radius: 50%; }
+
+    footer { padding: 32px 0 48px; color: var(--texto-suave); font-size: .92rem; border-top: 1px solid var(--borda); }
+    footer .conteiner { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-calendario" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></g></symbol>
+      <symbol id="i-quinzena" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 10v11"/></g></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="m8 12 3 3 5-6"/></g></symbol>
+      <symbol id="i-copiar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2.5"/><path d="M4 16V6a3 3 0 0 1 3-3h9"/><path d="M12 14.5h5"/><path d="m14.8 12 2.5 2.5-2.5 2.5"/></g></symbol>
+      <symbol id="i-conta" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="m9 11 2 2 4-4"/></g></symbol>
+      <symbol id="i-comparar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16"/><path d="m3 8 4-4 4 4"/><path d="M17 20V4"/><path d="m21 16-4 4-4-4"/></g></symbol>
+      <symbol id="i-grafico" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/></g></symbol>
+      <symbol id="i-idioma" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></g></symbol>
+      <symbol id="i-lua" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-cadeado" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></symbol>
+      <symbol id="i-offline" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1"/><path d="M3 3l18 18"/></g></symbol>
+      <symbol id="i-moeda" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9a2.5 2.5 0 0 0-2.5-1.5c-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2A2.6 2.6 0 0 1 9.5 15M12 6v1.5M12 16.5V18"/></g></symbol>
+      <symbol id="i-android" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10a7 7 0 0 1 14 0v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><path d="M7 4l1.5 2.5M17 4l-1.5 2.5M9.5 12h.01M14.5 12h.01"/></g></symbol>
+      <symbol id="i-apple" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c1.5-1.5 4-1.6 5.5-.3-1.6 1-2.3 2.5-2.1 4.3.2 1.6 1.2 2.8 2.6 3.4-.8 2.6-2.4 5.1-4 5.1-1.2 0-1.6-.7-3-.7s-1.9.7-3 .7c-2 0-4.5-4.3-4.5-8 0-3.1 2-4.9 4-4.9 1.3 0 2.1.7 2.5.7z"/><path d="M12 7c0-2 1.3-3.6 3-4"/></g></symbol>
+      <symbol id="i-web" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/></g></symbol>
+      <symbol id="i-baixar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></g></symbol>
+      <symbol id="i-dica" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></g></symbol>
+    </defs>
+  </svg>
+
+  <header class="barra">
+    <div class="conteiner">
+      <a class="marca" href="#inicio"><img src="../icones/icone-192.png" alt="" width="36" height="36">ContaCerta</a>
+      <nav aria-label="Seções da página">
+        <a class="opcional" href="#como-funciona">Como funciona</a>
+        <a class="opcional" href="#recursos">Recursos</a>
+        <a class="opcional" href="#duvidas">Dúvidas</a>
+        <a href="#baixar">Baixar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <div class="abertura">
+      <div class="conteiner">
+        <div>
+          <p class="selo">Gratuito · Sem cadastro · Funciona sem internet</p>
+          <h1>Seu dinheiro em ordem, <em>mês a mês</em> ou <em>quinzena a quinzena</em>.</h1>
+          <p class="chamada">
+            O ContaCerta mostra quanto entrou, quanto saiu e o que ainda falta pagar — com letras grandes,
+            botões fáceis de tocar e nada de termos complicados.
+          </p>
+          <div class="acoes">
+            <a class="botao botao--principal" href="https://github.com/luizflaviomatias/orcamento-quinzenal/releases/latest" data-download-android>
+              <svg class="icone" aria-hidden="true"><use href="#i-baixar"/></svg>
+              <span>Baixar para Android<small data-detalhe-android>Arquivo APK</small></span>
+            </a>
+            <a class="botao botao--claro" href="#iphone">
+              <svg class="icone" aria-hidden="true"><use href="#i-apple"/></svg>
+              <span>Usar no iPhone</span>
+            </a>
+          </div>
+          <p class="nota-abertura">Disponível em português, español e English.</p>
+        </div>
+
+        <div class="celular" role="img" aria-label="Ilustração da tela principal do ContaCerta com os meses do ano, a lista de gastos da quinzena e o resumo do mês">
+          <div class="tela" aria-hidden="true">
+            <div class="tela__topo"><i></i>ContaCerta<b>Quinzena</b><span class="tela__bandeira"></span><span>☰</span></div>
+            <div class="tela__meses">
+              <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span>
+              <span>Mai</span><span>Jun</span><span>Jul</span><span>Ago</span>
+              <span>Set</span><span>Out</span><span class="ativo">Nov</span><span>Dez</span>
+            </div>
+            <div class="tela__cartao">
+              <h4>1ª quinzena · Gastos</h4>
+              <div class="tela__linha paga"><i></i><span>Aluguel</span><b>R$ 900,00</b></div>
+              <div class="tela__linha paga"><i></i><span>Luz</span><b>R$ 148,30</b></div>
+              <div class="tela__linha"><i></i><span>Internet</span><b>R$ 99,90</b></div>
+              <div class="tela__linha"><i></i><span>Mercado</span><b>R$ 640,00</b></div>
+              <div class="tela__linha"><i></i><span>Farmácia</span><b>R$ 85,40</b></div>
+            </div>
+            <div class="tela__resumo">
+              <div><small>Recebido</small><b>R$ 3.000</b></div>
+              <div><small>Gasto</small><b>R$ 1.873</b></div>
+              <div><small>Saldo</small><b>R$ 1.127</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="como-funciona" aria-labelledby="titulo-como-funciona">
+      <div class="conteiner">
+        <h2 class="titulo-secao" id="titulo-como-funciona">Você escolhe como controlar</h2>
+        <p class="subtitulo-secao">
+          Na primeira vez que abre o app, ele pergunta como você recebe o seu dinheiro. Dá para mudar depois,
+          a qualquer momento, sem perder nenhum lançamento.
+        </p>
+        <div class="modos">
+          <article class="modo">
+            <h3><svg class="icone" aria-hidden="true"><use href="#i-calendario"/></svg>Por mês</h3>
+            <p>Para quem recebe uma vez por mês. Tudo aparece num cartão só, do dia 1 ao último dia.</p>
+            <ul>
+              <li>Um salário e todos os gastos juntos</li>
+              <li>Resumo do mês sempre à vista</li>
+            </ul>
+          </article>
+          <article class="modo">
+            <h3><svg class="icone" aria-hidden="true"><use href="#i-quinzena"/></svg>Por quinzena</h3>
+            <p>Para quem recebe em duas vezes. O mês é dividido em 1ª quinzena (dias 1 a 15) e 2ª quinzena (16 ao fim).</p>
+            <ul>
+              <li>Cada quinzena com o próprio saldo</li>
+              <li>Ideal para salário e adiantamento</li>
+            </ul>
+          </article>
+        </div>
+        <p class="dica">
+          <svg class="icone" aria-hidden="true"><use href="#i-dica"/></svg>
+          <span>Para trocar a visualização, toque no botão <strong>Mês / Quinzena</strong> no topo da tela principal, ao lado da bandeira.</span>
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="titulo-passos" style="padding-top:0">
+      <div class="conteiner">
+        <h2 class="titulo-secao" id="titulo-passos">Como usar, passo a passo</h2>
+        <p class="subtitulo-secao">O app já vem com as contas mais comuns da casa, com valor zerado. É só preencher.</p>
+        <ol class="passos">
+          <li><div><strong>Escolha o mês</strong><span>Os doze meses ficam no alto da tela. O mês de hoje vem marcado.</span></div></li>
+          <li><div><strong>Preencha o que recebeu e o que gastou</strong><span>Toque no valor ao lado de cada conta e digite. Os totais se atualizam na hora. Para algo novo, use os botões amarelos <em>+ Recebimento</em> e <em>+ Gasto</em>.</span></div></li>
+          <li><div><strong>Marque o que já pagou</strong><span>Cada gasto tem um quadradinho. Marcado, a linha fica riscada e travada para não ser alterada por engano.</span></div></li>
+          <li><div><strong>Repita nos próximos meses com um toque</strong><span>O botão de copiar, ao lado do nome do mês, leva todos os lançamentos para os meses seguintes. As cópias chegam como não pagas.</span></div></li>
+          <li><div><strong>Acompanhe pelos relatórios</strong><span>No menu (☰), veja o que falta pagar, como este mês ficou comparado ao anterior e o resumo do ano.</span></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="recursos" aria-labelledby="titulo-recursos" style="padding-top:0">
+      <div class="conteiner">
+        <h2 class="titulo-secao" id="titulo-recursos">Tudo o que o app faz</h2>
+        <p class="subtitulo-secao">Feito para ser simples de entender, inclusive para quem tem pouca prática com celular.</p>
+        <div class="grade">
+          <article class="cartao relatorio">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-conta"/></svg></span>
+            <span class="rotulo">Relatório</span>
+            <h3>Contas a pagar</h3>
+            <p>Mostra em letra grande quanto falta pagar no mês e separa as contas em <strong>atrasadas</strong>, <strong>vencem hoje</strong>, <strong>próximas</strong> e <strong>já pagas</strong>. Dá para marcar como paga ali mesmo.</p>
+          </article>
+          <article class="cartao relatorio">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-comparar"/></svg></span>
+            <span class="rotulo">Relatório</span>
+            <h3>Este mês × anterior</h3>
+            <p>Uma frase direta — “Você gastou R$ 40,00 a mais que em outubro” — e a lista do que subiu e do que baixou, com a diferença de cada conta.</p>
+          </article>
+          <article class="cartao relatorio">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-grafico"/></svg></span>
+            <span class="rotulo">Relatório</span>
+            <h3>Resumo do ano</h3>
+            <p>Gasto, recebido e saldo do ano, média de gasto por mês, quanto da renda ficou comprometida, o maior gasto e os gastos por mês e por categoria.</p>
+          </article>
+          <article class="cartao">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg></span>
+            <h3>Marcar como pago</h3>
+            <p>Cada gasto tem uma caixa para marcar. A linha fica riscada e travada até você desmarcar.</p>
+          </article>
+          <article class="cartao">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-copiar"/></svg></span>
+            <h3>Copiar para os próximos meses</h3>
+            <p>Escolha os meses que vão receber a cópia. Dias que não existem no mês (como 30 de fevereiro) vão para o último dia.</p>
+          </article>
+          <article class="cartao">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-idioma"/></svg></span>
+            <h3>Três idiomas</h3>
+            <p>Português, espanhol e inglês. Toque na bandeira no topo para trocar. O app começa no idioma do celular.</p>
+          </article>
+          <article class="cartao">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-moeda"/></svg></span>
+            <h3>Real, euro ou dólar</h3>
+            <p>A moeda é escolhida no menu, separada do idioma. Os números seguem o jeito de escrever de cada idioma.</p>
+          </article>
+          <article class="cartao">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-lua"/></svg></span>
+            <h3>Tema claro ou escuro</h3>
+            <p>O claro é o padrão. O escuro, mais confortável à noite, fica em Preferências, no menu.</p>
+          </article>
+          <article class="cartao">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-offline"/></svg></span>
+            <h3>Funciona sem internet</h3>
+            <p>Depois de instalado, o app abre e funciona mesmo sem conexão.</p>
+          </article>
+          <article class="cartao">
+            <span class="icone-grande"><svg class="icone" aria-hidden="true"><use href="#i-cadeado"/></svg></span>
+            <h3>Seus dados ficam com você</h3>
+            <p>Sem cadastro, sem senha e sem servidor: os lançamentos ficam guardados só no seu aparelho e nada é enviado para fora.</p>
+          </article>
+        </div>
+
+        <h3 style="margin:40px 0 4px;font-size:1.25rem">As cores sempre dizem a mesma coisa</h3>
+        <div class="tabela-cores">
+          <span class="cor"><i style="background:var(--receita)"></i>Verde: dinheiro que entrou ou conta paga</span>
+          <span class="cor"><i style="background:var(--despesa)"></i>Framboesa: gastos</span>
+          <span class="cor"><i style="background:var(--negativo)"></i>Vermelho: saldo negativo ou conta atrasada</span>
+          <span class="cor"><i style="background:var(--destaque)"></i>Amarelo: botões para agir</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="baixar" class="download" aria-labelledby="titulo-baixar">
+      <div class="conteiner">
+        <h2 class="titulo-secao" id="titulo-baixar">Baixe e comece agora</h2>
+        <p class="subtitulo-secao">Gratuito, sem anúncios e sem cadastro. Escolha o seu aparelho.</p>
+        <div class="plataformas">
+          <article class="plataforma">
+            <h3><svg class="icone" aria-hidden="true"><use href="#i-android"/></svg>Android</h3>
+            <ol>
+              <li>Toque em <strong>Baixar APK</strong>.</li>
+              <li>Abra o arquivo baixado.</li>
+              <li>Se o celular pedir, permita <em>instalar apps desconhecidos</em> para o navegador.</li>
+              <li>Toque em <strong>Instalar</strong> (ou <strong>Atualizar</strong>, se já tiver o app).</li>
+            </ol>
+            <p class="detalhe-download" data-detalhe-android-completo>Versão mais recente, publicada no GitHub.</p>
+            <a class="botao botao--principal" href="https://github.com/luizflaviomatias/orcamento-quinzenal/releases/latest" data-download-android>
+              <svg class="icone" aria-hidden="true"><use href="#i-baixar"/></svg><span>Baixar APK</span>
+            </a>
+          </article>
+          <article class="plataforma" id="iphone">
+            <h3><svg class="icone" aria-hidden="true"><use href="#i-apple"/></svg>iPhone e iPad</h3>
+            <ol>
+              <li>Abra o link abaixo no <strong>Safari</strong>.</li>
+              <li>Toque no botão <strong>Compartilhar</strong> (quadrado com seta para cima).</li>
+              <li>Escolha <strong>Adicionar à Tela de Início</strong> e toque em <strong>Adicionar</strong>.</li>
+              <li>Abra o ContaCerta pelo ícone na tela de início.</li>
+            </ol>
+            <p class="detalhe-download">Abrir pelo ícone é importante: assim o iPhone mantém seus dados guardados.</p>
+            <a class="botao botao--roxo" href="../">
+              <svg class="icone" aria-hidden="true"><use href="#i-apple"/></svg><span>Abrir no iPhone</span>
+            </a>
+          </article>
+          <article class="plataforma">
+            <h3><svg class="icone" aria-hidden="true"><use href="#i-web"/></svg>Computador</h3>
+            <ol>
+              <li>Abra o app no Chrome, Edge ou Safari.</li>
+              <li>Para instalar, use o ícone de instalar na barra de endereço.</li>
+              <li>Os dados ficam guardados naquele navegador.</li>
+            </ol>
+            <p class="detalhe-download">Também funciona em celulares Android pelo Chrome, sem baixar o APK.</p>
+            <a class="botao botao--roxo" href="../">
+              <svg class="icone" aria-hidden="true"><use href="#i-web"/></svg><span>Abrir no navegador</span>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="duvidas" aria-labelledby="titulo-duvidas">
+      <div class="conteiner">
+        <h2 class="titulo-secao" id="titulo-duvidas">Dúvidas frequentes</h2>
+        <p class="subtitulo-secao">Respostas curtas para as perguntas mais comuns.</p>
+        <div class="perguntas">
+          <details>
+            <summary>Preciso criar conta ou senha?</summary>
+            <p>Não. Basta instalar e usar. O app não pede e-mail, telefone nem senha.</p>
+          </details>
+          <details>
+            <summary>Onde ficam guardados os meus dados?</summary>
+            <p>Só no seu aparelho. Nada é enviado para a internet, e ninguém além de você vê os seus lançamentos. Por isso, proteja o celular com a senha ou a digital da tela de bloqueio.</p>
+          </details>
+          <details>
+            <summary>Se eu atualizar o app, perco o que já lancei?</summary>
+            <p>Não. A versão nova instala por cima da antiga e mantém todos os lançamentos.</p>
+          </details>
+          <details>
+            <summary>E se eu trocar de celular ou apagar os dados do navegador?</summary>
+            <p>Os lançamentos ficam só no aparelho em que foram feitos. Trocar de celular, desinstalar o app ou limpar os dados do navegador apaga as informações. Ainda não há cópia de segurança entre aparelhos.</p>
+          </details>
+          <details>
+            <summary>Funciona sem internet?</summary>
+            <p>Sim. A internet só é usada para baixar ou abrir o app pela primeira vez. Depois, ele funciona mesmo sem conexão.</p>
+          </details>
+          <details>
+            <summary>Posso mudar de mensal para quinzenal depois?</summary>
+            <p>Pode, quantas vezes quiser: pelo botão Mês / Quinzena no topo ou em Preferências, no menu. Os lançamentos continuam os mesmos — muda só o jeito de ver.</p>
+          </details>
+          <details>
+            <summary>Por que o Android avisa sobre “apps desconhecidos”?</summary>
+            <p>Porque o ContaCerta é instalado direto do site, e não pela Play Store. É um aviso padrão do Android para qualquer app baixado assim; basta permitir a instalação para o navegador que você usou.</p>
+          </details>
+          <details>
+            <summary>Tem versão na App Store?</summary>
+            <p>Ainda não. No iPhone, use o app pelo Safari e adicione à tela de início: ele abre em tela cheia, com ícone próprio, como um app comum.</p>
+          </details>
+          <details>
+            <summary>Quanto custa?</summary>
+            <p>Nada. O ContaCerta é gratuito e não tem anúncios.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="conteiner">
+      <span>ContaCerta · Orçamento simples, por mês ou por quinzena</span>
+      <span><a href="https://github.com/luizflaviomatias/orcamento-quinzenal/releases">Todas as versões</a> · <a href="../">Abrir o app</a></span>
+    </div>
+  </footer>
+
+  <script>
+    // Aponta os botões de Android para o APK da versão mais recente publicada no GitHub.
+    // Sem internet ou se a consulta falhar, os botões continuam levando à página da versão mais recente.
+    (async function apontarParaOApkMaisRecente() {
+      const RELEASE_MAIS_RECENTE = 'https://api.github.com/repos/luizflaviomatias/orcamento-quinzenal/releases/latest';
+      try {
+        const resposta = await fetch(RELEASE_MAIS_RECENTE, { headers: { Accept: 'application/vnd.github+json' } });
+        if (!resposta.ok) return;
+        const release = await resposta.json();
+        const apk = release.assets.find((arquivo) => arquivo.name.endsWith('.apk'));
+        if (!apk) return;
+        const versao = apk.name.match(/(\d+\.\d+\.\d+)/)?.[1] ?? release.tag_name;
+        const tamanhoEmMb = (apk.size / 1024 / 1024).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+        for (const botao of document.querySelectorAll('[data-download-android]')) botao.href = apk.browser_download_url;
+        for (const detalhe of document.querySelectorAll('[data-detalhe-android]')) detalhe.textContent = `Versão ${versao} · ${tamanhoEmMb} MB`;
+        for (const detalhe of document.querySelectorAll('[data-detalhe-android-completo]')) {
+          detalhe.textContent = `Versão ${versao} · ${tamanhoEmMb} MB · arquivo ${apk.name}`;
+        }
+      } catch {
+        // Mantém o link para a página da versão mais recente.
+      }
+    })();
+  </script>
+</body>
+</html>
