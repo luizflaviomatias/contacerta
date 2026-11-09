@@ -432,6 +432,7 @@ button:disabled { cursor: default; }
 .menu-lateral__opcao:active { background: var(--campo); }
 .menu-lateral__opcao[aria-current] { background: var(--roxo-suave); }
 .menu-lateral__opcao[aria-current] strong { color: var(--roxo-texto); }
+.menu-lateral__versao { margin: 24px 12px 0; color: var(--texto-suave); font-size: .85rem; text-align: center; }
 
 /* Voltar para o mês (telas de relatório) */
 .botao-voltar {

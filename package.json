@@ -1,12 +1,13 @@
 {
   "name": "contacerta",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node ferramentas/servidor.mjs 5173",
     "test": "node --test testes/",
-    "www": "node ferramentas/prepararWww.mjs",
+    "versao": "node ferramentas/gerarVersao.mjs",
+    "www": "npm run versao && node ferramentas/prepararWww.mjs",
     "android:sync": "npm run www && cap sync android",
     "apk": "npm run android:sync && node ferramentas/gerarApk.mjs",
     "ios:sync": "npm run www && cap sync ios && node ferramentas/sincronizarVersaoIos.mjs"
@@ -14,7 +15,7 @@
   "dependencies": {
     "@capacitor/android": "7.4.4",
     "@capacitor/core": "7.4.4",
-    "@capacitor/ios": "^7.4.4"
+    "@capacitor/ios": "7.4.4"
   },
   "devDependencies": {
     "@capacitor/cli": "7.4.4",

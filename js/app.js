@@ -25,6 +25,7 @@ import { criarSeletorDeIdioma } from './ui/seletorDeIdioma.js';
 import { criarSeletorDeMes } from './ui/seletorDeMes.js';
 import { criarSeletorDeModo } from './ui/seletorDeModo.js';
 import { criarTelaBoasVindas } from './ui/telaBoasVindas.js';
+import { VERSAO_DO_APP } from './versao.js';
 
 const elemento = (id) => document.getElementById(id);
 
@@ -197,6 +198,7 @@ function aplicarPreferencias(atuais) {
   seletorDeModo.renderizar(modoDeControle());
 }
 
+elemento('versao-do-app').textContent = `ContaCerta ${VERSAO_DO_APP}`;
 aplicarPreferencias(preferencias.obter());
 navegacao.abrirTela(preferencias.precisaEscolherModo() ? 'boas-vindas' : 'mes');
 registrarFuncionamentoOffline();
