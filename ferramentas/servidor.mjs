@@ -27,7 +27,7 @@ createServer(async (requisicao, resposta) => {
   } catch {
     responder(resposta, 404, 'Não encontrado');
   }
-}).listen(PORTA, () => console.log(`Orçamento Quinzenal em http://localhost:${PORTA}`));
+}).listen(PORTA, () => console.log(`ContaCerta em http://localhost:${PORTA}`));
 
 function responder(resposta, status, mensagem) {
   resposta.writeHead(status, { 'Content-Type': 'text/plain; charset=utf-8' });

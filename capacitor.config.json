@@ -1,6 +1,6 @@
 {
   "appId": "io.github.luizflaviomatias.orcamentoquinzenal",
-  "appName": "Orçamento Quinzenal",
+  "appName": "ContaCerta",
   "webDir": "www",
   "android": {
     "backgroundColor": "#f7f6fa"

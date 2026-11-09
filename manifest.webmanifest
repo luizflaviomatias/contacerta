@@ -1,6 +1,6 @@
 {
-  "name": "Orçamento Quinzenal",
-  "short_name": "Orçamento",
+  "name": "ContaCerta",
+  "short_name": "ContaCerta",
   "description": "Controle de orçamento para quem recebe o salário em duas vezes no mês.",
   "lang": "pt-BR",
   "start_url": "./",

@@ -1,6 +1,7 @@
 // Guarda os lançamentos por ano. O armazenamento é injetado (localStorage no app, memória nos testes).
 import { MESES_NO_ANO, criarLancamento } from '../dominio/orcamento.js';
 
+// Nome antigo do app mantido de propósito: trocar a chave apagaria os lançamentos de quem já usa.
 const PREFIXO_DA_CHAVE = 'orcamento-quinzenal:ano:';
 
 export class ErroArmazenamento extends Error {

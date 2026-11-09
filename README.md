@@ -1,4 +1,4 @@
-# Orçamento Quinzenal
+# ContaCerta
 
 App (PWA) de controle de orçamento para quem recebe o salário em duas vezes no mês.
 Funciona em Android e iOS e abre sem internet; os dados ficam salvos no próprio aparelho.
@@ -27,7 +27,7 @@ crie `android/local.properties` com `sdk.dir=...`.
 
 ```bash
 npm install
-npm run apk   # gera OrcamentoQuinzenal-<versão>.apk na raiz do projeto
+npm run apk   # gera ContaCerta-<versão>.apk na raiz do projeto
 ```
 
 O APK é de depuração (assinado com a chave de debug): serve para instalar direto no celular,
