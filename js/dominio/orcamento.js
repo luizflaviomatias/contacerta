@@ -1,10 +1,11 @@
-// Regras do orçamento quinzenal. Funções puras: recebem dados, devolvem dados novos.
+// Regras do orçamento, por mês ou por quinzena. Funções puras: recebem dados, devolvem dados novos.
 
 export const TIPO = Object.freeze({ RECEITA: 'receita', DESPESA: 'despesa' });
 export const QUINZENA = Object.freeze({ PRIMEIRA: 'primeira', SEGUNDA: 'segunda' });
 /** Forma de controlar o orçamento: o mês inteiro de uma vez ou dividido em duas quinzenas. */
 export const MODO = Object.freeze({ MENSAL: 'mensal', QUINZENAL: 'quinzenal' });
-export const MES_INTEIRO = 'mes';
+/** Parte do mês mostrada na tela: o mês inteiro (modo mensal) ou uma das quinzenas (modo quinzenal). */
+export const PERIODO = Object.freeze({ MES_INTEIRO: 'mes', ...QUINZENA });
 export const MESES_NO_ANO = 12;
 
 const ULTIMO_DIA_DA_PRIMEIRA_QUINZENA = 15;
@@ -51,13 +52,13 @@ export function intervaloDaQuinzena(quinzena, ano, mes) {
  * @returns {Array<{ periodo: string, primeiroDia: number, ultimoDia: number }>}
  */
 export function periodosDoMes(modo, ano, mes) {
-  if (modo === MODO.MENSAL) return [{ periodo: MES_INTEIRO, primeiroDia: 1, ultimoDia: diasNoMes(ano, mes) }];
+  if (modo === MODO.MENSAL) return [{ periodo: PERIODO.MES_INTEIRO, primeiroDia: 1, ultimoDia: diasNoMes(ano, mes) }];
   return [QUINZENA.PRIMEIRA, QUINZENA.SEGUNDA].map((quinzena) => ({ periodo: quinzena, ...intervaloDaQuinzena(quinzena, ano, mes) }));
 }
 
 /** Período em que o dia cai, para abrir a tela já na parte do mês em que estamos. */
 export function periodoDoDia(modo, dia) {
-  return modo === MODO.MENSAL ? MES_INTEIRO : quinzenaDoDia(dia);
+  return modo === MODO.MENSAL ? PERIODO.MES_INTEIRO : quinzenaDoDia(dia);
 }
 
 /** O mês `deslocamento` meses depois (ou antes, se negativo) de `referencia`, atravessando o ano se preciso. */
@@ -123,12 +124,7 @@ export function alterarLancamento(lancamentos, id, alteracoes) {
   );
 }
 
-/** Recebimentos primeiro, depois gastos; dentro de cada grupo, por dia (ordem estável). */
-export function lancamentosDaQuinzena(lancamentos, quinzena) {
-  return ordenarParaExibicao(lancamentos.filter((lancamento) => quinzenaDoDia(lancamento.dia) === quinzena));
-}
-
-/** Lançamentos com dia dentro do intervalo, na mesma ordem de exibição das quinzenas. */
+/** Lançamentos com dia dentro do intervalo: recebimentos primeiro, depois gastos; em cada grupo, por dia. */
 export function lancamentosDoIntervalo(lancamentos, { primeiroDia, ultimoDia }) {
   return ordenarParaExibicao(lancamentos.filter(({ dia }) => dia >= primeiroDia && dia <= ultimoDia));
 }
@@ -164,12 +160,18 @@ export function resumirAno(lancamentosPorMes) {
     recebido,
     gasto,
     saldo: recebido - gasto,
-    mediaMensalDeGasto: Math.round(gasto / MESES_NO_ANO),
+    mediaMensalDeGasto: mediaDosMesesComGasto(totaisPorMes),
     percentualComprometido: recebido === 0 ? 0 : Math.round((gasto / recebido) * 100),
     gastosPorMes: totaisPorMes.map((total) => total.gasto),
     gastosPorCategoria,
     maiorCategoria: gastosPorCategoria[0] ?? { descricao: '—', totalCentavos: 0 },
   };
+}
+
+/** Média só dos meses que têm gasto: meses futuros ainda zerados não puxam a média para baixo. */
+function mediaDosMesesComGasto(totaisPorMes) {
+  const gastosDosMeses = totaisPorMes.map((total) => total.gasto).filter((gasto) => gasto > 0);
+  return gastosDosMeses.length === 0 ? 0 : Math.round(somar(gastosDosMeses) / gastosDosMeses.length);
 }
 
 function somar(valores) {

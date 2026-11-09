@@ -1,14 +1,14 @@
 import { ErroValorInvalido } from '../dominio/dinheiro.js';
 import {
-  MES_INTEIRO, QUINZENA, TIPO, lancamentosDoIntervalo, periodosDoMes, totalizar,
+  PERIODO, TIPO, lancamentosDoIntervalo, periodosDoMes, totalizar,
 } from '../dominio/orcamento.js';
 import { escaparHtml } from './formatacao.js';
 import { ICONE } from './icones.js';
 
 const CHAVE_DO_TITULO = {
-  [QUINZENA.PRIMEIRA]: 'mes.quinzena.primeira',
-  [QUINZENA.SEGUNDA]: 'mes.quinzena.segunda',
-  [MES_INTEIRO]: 'mes.mesInteiro',
+  [PERIODO.PRIMEIRA]: 'mes.quinzena.primeira',
+  [PERIODO.SEGUNDA]: 'mes.quinzena.segunda',
+  [PERIODO.MES_INTEIRO]: 'mes.mesInteiro',
 };
 
 const TEXTOS_DO_GRUPO = {

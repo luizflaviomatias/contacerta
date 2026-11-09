@@ -1,7 +1,7 @@
 // Categorias iniciais da planilha "Controle Financeiro Simples - Modelo Didático", em cada idioma.
 // Os valores começam zerados: cada pessoa preenche os seus no aparelho.
-import { MESES_NO_ANO, TIPO, criarLancamento, limitarDiaAoMes } from '../dominio/orcamento.js';
-import { IDIOMA, MODO } from './preferencias.js';
+import { MESES_NO_ANO, MODO, TIPO, criarLancamento, limitarDiaAoMes } from '../dominio/orcamento.js';
+import { IDIOMA } from './preferencias.js';
 
 const DIA_DO_SALARIO = 15;
 const DIA_DO_ADIANTAMENTO = 30;

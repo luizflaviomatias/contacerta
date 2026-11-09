@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   ErroLancamentoInvalido, QUINZENA, TIPO, adicionarLancamento, alterarLancamento, criarLancamento,
-  MES_INTEIRO, MODO, intervaloDaQuinzena, lancamentosDaQuinzena, lancamentosDoIntervalo, limitarDiaAoMes,
+  MODO, PERIODO, intervaloDaQuinzena, lancamentosDoIntervalo, limitarDiaAoMes,
   periodoDoDia, periodosDoMes, quinzenaDoDia, removerLancamento,
   resumirAno, totalizar,
 } from '../js/dominio/orcamento.js';
@@ -30,8 +30,8 @@ test('dia 30 em fevereiro vira o último dia do mês', () => {
 });
 
 test('modo mensal tem um único período com o mês inteiro', () => {
-  assert.deepEqual(periodosDoMes(MODO.MENSAL, 2026, 1), [{ periodo: MES_INTEIRO, primeiroDia: 1, ultimoDia: 28 }]);
-  assert.equal(periodoDoDia(MODO.MENSAL, 20), MES_INTEIRO);
+  assert.deepEqual(periodosDoMes(MODO.MENSAL, 2026, 1), [{ periodo: PERIODO.MES_INTEIRO, primeiroDia: 1, ultimoDia: 28 }]);
+  assert.equal(periodoDoDia(MODO.MENSAL, 20), PERIODO.MES_INTEIRO);
 });
 
 test('modo quinzenal tem as duas quinzenas, a segunda até o fim do mês', () => {
@@ -63,7 +63,7 @@ test('quinzena lista recebimentos antes dos gastos e ignora a outra quinzena', (
   const gasto = despesa(10, 3);
   const salario = receita(20, 15);
   const daSegunda = despesa(30, 20);
-  assert.deepEqual(lancamentosDaQuinzena([gasto, daSegunda, salario], QUINZENA.PRIMEIRA), [salario, gasto]);
+  assert.deepEqual(lancamentosDoIntervalo([gasto, daSegunda, salario], intervaloDaQuinzena(QUINZENA.PRIMEIRA, 2026, 0)), [salario, gasto]);
 });
 
 test('incluir, alterar e excluir não modificam a lista original', () => {
@@ -91,8 +91,8 @@ test('modelo da planilha cria as 24 categorias zeradas em cada mês', () => {
   const ano = criarAnoConformePlanilha(2026, gerarId);
   assert.equal(ano.length, 12);
   for (const mes of ano) {
-    assert.equal(lancamentosDaQuinzena(mes, QUINZENA.PRIMEIRA).length, 12);
-    assert.equal(lancamentosDaQuinzena(mes, QUINZENA.SEGUNDA).length, 12);
+    assert.equal(lancamentosDoIntervalo(mes, intervaloDaQuinzena(QUINZENA.PRIMEIRA, 2026, 0)).length, 12);
+    assert.equal(lancamentosDoIntervalo(mes, intervaloDaQuinzena(QUINZENA.SEGUNDA, 2026, 0)).length, 12);
     assert.deepEqual(totalizar(mes), { recebido: 0, gasto: 0, saldo: 0 });
   }
 });
@@ -148,4 +148,15 @@ test('rejeita marca de pago que não seja verdadeiro ou falso', () => {
     () => criarLancamento({ id: 'x', descricao: 'Luz', tipo: TIPO.DESPESA, valorCentavos: 1, dia: 1, pago: 'sim' }),
     ErroLancamentoInvalido,
   );
+});
+
+test('média mensal considera só os meses que têm gasto', () => {
+  const meses = Array.from({ length: 12 }, () => []);
+  meses[0] = [despesa(30000)];
+  meses[1] = [despesa(10000)];
+  assert.equal(resumirAno(meses).mediaMensalDeGasto, 20000);
+});
+
+test('ano sem gastos tem média zero', () => {
+  assert.equal(resumirAno(Array.from({ length: 12 }, () => [])).mediaMensalDeGasto, 0);
 });

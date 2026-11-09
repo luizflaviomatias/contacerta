@@ -1,12 +1,12 @@
 // Ponto de composição: cria as dependências, liga a interface às regras e guarda o estado da tela.
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
-import { MODO, criarPreferencias } from './dados/preferencias.js';
+import { criarPreferencias } from './dados/preferencias.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
 import { compararMeses } from './dominio/comparacaoDeMeses.js';
 import { resumirContasAPagar } from './dominio/contasAPagar.js';
 import {
   ErroLancamentoInvalido, adicionarLancamento, alterarLancamento, copiarLancamentosParaMes, criarLancamento,
-  deslocarMes, mesesSeguintes, periodoDoDia, removerLancamento, resumirAno,
+  MODO, deslocarMes, mesesSeguintes, periodoDoDia, removerLancamento, resumirAno,
 } from './dominio/orcamento.js';
 import { aplicarTextosNaPagina, criarLocalizacao } from './i18n/localizacao.js';
 import { criarAviso } from './ui/aviso.js';

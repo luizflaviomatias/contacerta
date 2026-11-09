@@ -1,8 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  IDIOMA, MODO, MOEDA, TEMA, criarPreferencias, escolherIdiomaDoAparelho,
+  IDIOMA, MOEDA, TEMA, criarPreferencias, escolherIdiomaDoAparelho,
 } from '../js/dados/preferencias.js';
+import { MODO } from '../js/dominio/orcamento.js';
 
 function criarArmazenamentoEmMemoria(inicial = {}) {
   const dados = new Map(Object.entries(inicial));
