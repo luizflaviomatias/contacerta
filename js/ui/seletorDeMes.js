@@ -1,9 +1,8 @@
 import { MESES_NO_ANO } from '../dominio/orcamento.js';
-import { nomeAbreviadoDoMes, nomeDoMes } from './formatacao.js';
 import { ICONE } from './icones.js';
 
 /** Seletor só de meses: ano com setas e os 12 meses clicáveis. Listeners registrados uma única vez. */
-export function criarSeletorDeMes(container, { aoSelecionarMes, aoTrocarAno }) {
+export function criarSeletorDeMes(container, { local, aoSelecionarMes, aoTrocarAno }) {
   container.addEventListener('click', (evento) => {
     const botao = evento.target.closest('button[data-acao]');
     if (!botao) return;
@@ -18,19 +17,19 @@ export function criarSeletorDeMes(container, { aoSelecionarMes, aoTrocarAno }) {
   function renderizar({ ano, mesSelecionado, mesAtual }) {
     container.innerHTML = `
       <div class="seletor-mes__cabecalho">
-        <button class="botao-icone" data-acao="ano-anterior" aria-label="Ano anterior">${ICONE.anterior}</button>
+        <button class="botao-icone" data-acao="ano-anterior" aria-label="${local.t('periodo.anoAnterior')}">${ICONE.anterior}</button>
         <h2 class="seletor-mes__titulo">${ano}</h2>
-        <button class="botao-icone" data-acao="ano-seguinte" aria-label="Próximo ano">${ICONE.seguinte}</button>
+        <button class="botao-icone" data-acao="ano-seguinte" aria-label="${local.t('periodo.anoSeguinte')}">${ICONE.seguinte}</button>
       </div>
       <div class="seletor-mes__grade">
-        ${Array.from({ length: MESES_NO_ANO }, (_, mes) => botaoDoMes(mes, mesSelecionado, mesAtual)).join('')}
+        ${Array.from({ length: MESES_NO_ANO }, (_, mes) => botaoDoMes(mes, mesSelecionado, mesAtual, local)).join('')}
       </div>`;
   }
 
   return { renderizar };
 }
 
-function botaoDoMes(mes, mesSelecionado, mesAtual) {
+function botaoDoMes(mes, mesSelecionado, mesAtual, local) {
   const classes = [
     'seletor-mes__mes',
     mes === mesSelecionado && 'seletor-mes__mes--selecionado',
@@ -38,7 +37,7 @@ function botaoDoMes(mes, mesSelecionado, mesAtual) {
   ].filter(Boolean).join(' ');
   return `
     <button class="${classes}" data-acao="selecionar-mes" data-mes="${mes}"
-            aria-pressed="${mes === mesSelecionado}" aria-label="${nomeDoMes(mes)}">
-      ${nomeAbreviadoDoMes(mes)}
+            aria-pressed="${mes === mesSelecionado}" aria-label="${local.nomeDoMes(mes)}">
+      ${local.nomeAbreviadoDoMes(mes)}
     </button>`;
 }

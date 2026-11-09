@@ -2,7 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   ErroLancamentoInvalido, QUINZENA, TIPO, adicionarLancamento, alterarLancamento, criarLancamento,
-  intervaloDaQuinzena, lancamentosDaQuinzena, limitarDiaAoMes, quinzenaDoDia, removerLancamento,
+  MES_INTEIRO, MODO, intervaloDaQuinzena, lancamentosDaQuinzena, lancamentosDoIntervalo, limitarDiaAoMes,
+  periodoDoDia, periodosDoMes, quinzenaDoDia, removerLancamento,
   resumirAno, totalizar,
 } from '../js/dominio/orcamento.js';
 import { criarAnoConformePlanilha } from '../js/dados/modeloPlanilha.js';
@@ -26,6 +27,28 @@ test('segunda quinzena termina no último dia do mês', () => {
 
 test('dia 30 em fevereiro vira o último dia do mês', () => {
   assert.equal(limitarDiaAoMes(30, 2026, 1), 28);
+});
+
+test('modo mensal tem um único período com o mês inteiro', () => {
+  assert.deepEqual(periodosDoMes(MODO.MENSAL, 2026, 1), [{ periodo: MES_INTEIRO, primeiroDia: 1, ultimoDia: 28 }]);
+  assert.equal(periodoDoDia(MODO.MENSAL, 20), MES_INTEIRO);
+});
+
+test('modo quinzenal tem as duas quinzenas, a segunda até o fim do mês', () => {
+  assert.deepEqual(periodosDoMes(MODO.QUINZENAL, 2026, 3), [
+    { periodo: QUINZENA.PRIMEIRA, primeiroDia: 1, ultimoDia: 15 },
+    { periodo: QUINZENA.SEGUNDA, primeiroDia: 16, ultimoDia: 30 },
+  ]);
+  assert.equal(periodoDoDia(MODO.QUINZENAL, 20), QUINZENA.SEGUNDA);
+});
+
+test('lançamentos do intervalo vêm com recebimentos antes dos gastos, por dia', () => {
+  const gastoDia20 = despesa(10, 20);
+  const salarioDia5 = receita(20, 5);
+  const gastoDia3 = despesa(30, 3);
+  assert.deepEqual(lancamentosDoIntervalo([gastoDia20, salarioDia5, gastoDia3], { primeiroDia: 1, ultimoDia: 31 }),
+    [salarioDia5, gastoDia3, gastoDia20]);
+  assert.deepEqual(lancamentosDoIntervalo([gastoDia20, gastoDia3], { primeiroDia: 16, ultimoDia: 31 }), [gastoDia20]);
 });
 
 test('totaliza recebido, gasto e saldo', () => {
@@ -72,6 +95,21 @@ test('modelo da planilha cria as 24 categorias zeradas em cada mês', () => {
     assert.equal(lancamentosDaQuinzena(mes, QUINZENA.SEGUNDA).length, 12);
     assert.deepEqual(totalizar(mes), { recebido: 0, gasto: 0, saldo: 0 });
   }
+});
+
+test('modelo da planilha vem no idioma escolhido', () => {
+  const [janeiro] = criarAnoConformePlanilha(2026, gerarId, { idioma: 'es-ES' });
+  assert.ok(janeiro.some((lancamento) => lancamento.descricao === 'Nómina (día 15)'));
+  assert.ok(janeiro.some((lancamento) => lancamento.descricao === 'Coche'));
+});
+
+test('modelo mensal tem um único salário e os mesmos gastos do quinzenal', () => {
+  const [mensal] = criarAnoConformePlanilha(2026, gerarId, { modo: 'mensal' });
+  const [quinzenal] = criarAnoConformePlanilha(2026, gerarId, { modo: 'quinzenal' });
+  const recebimentos = mensal.filter((lancamento) => lancamento.tipo === TIPO.RECEITA);
+  const descricoesDosGastos = (mes) => mes.filter((item) => item.tipo === TIPO.DESPESA).map((item) => item.descricao);
+  assert.deepEqual(recebimentos.map((item) => item.descricao), ['Salário']);
+  assert.deepEqual(descricoesDosGastos(mensal), descricoesDosGastos(quinzenal));
 });
 
 test('modelo da planilha põe o adiantamento no último dia de fevereiro', () => {

@@ -2,6 +2,9 @@
 
 export const TIPO = Object.freeze({ RECEITA: 'receita', DESPESA: 'despesa' });
 export const QUINZENA = Object.freeze({ PRIMEIRA: 'primeira', SEGUNDA: 'segunda' });
+/** Forma de controlar o orçamento: o mês inteiro de uma vez ou dividido em duas quinzenas. */
+export const MODO = Object.freeze({ MENSAL: 'mensal', QUINZENAL: 'quinzenal' });
+export const MES_INTEIRO = 'mes';
 export const MESES_NO_ANO = 12;
 
 const ULTIMO_DIA_DA_PRIMEIRA_QUINZENA = 15;
@@ -41,6 +44,20 @@ export function intervaloDaQuinzena(quinzena, ano, mes) {
   return quinzena === QUINZENA.PRIMEIRA
     ? { primeiroDia: 1, ultimoDia: ULTIMO_DIA_DA_PRIMEIRA_QUINZENA }
     : { primeiroDia: ULTIMO_DIA_DA_PRIMEIRA_QUINZENA + 1, ultimoDia: diasNoMes(ano, mes) };
+}
+
+/**
+ * Partes do mês exibidas na tela: uma só no modo mensal, as duas quinzenas no quinzenal.
+ * @returns {Array<{ periodo: string, primeiroDia: number, ultimoDia: number }>}
+ */
+export function periodosDoMes(modo, ano, mes) {
+  if (modo === MODO.MENSAL) return [{ periodo: MES_INTEIRO, primeiroDia: 1, ultimoDia: diasNoMes(ano, mes) }];
+  return [QUINZENA.PRIMEIRA, QUINZENA.SEGUNDA].map((quinzena) => ({ periodo: quinzena, ...intervaloDaQuinzena(quinzena, ano, mes) }));
+}
+
+/** Período em que o dia cai, para abrir a tela já na parte do mês em que estamos. */
+export function periodoDoDia(modo, dia) {
+  return modo === MODO.MENSAL ? MES_INTEIRO : quinzenaDoDia(dia);
 }
 
 /** O mês `deslocamento` meses depois (ou antes, se negativo) de `referencia`, atravessando o ano se preciso. */
@@ -108,9 +125,16 @@ export function alterarLancamento(lancamentos, id, alteracoes) {
 
 /** Recebimentos primeiro, depois gastos; dentro de cada grupo, por dia (ordem estável). */
 export function lancamentosDaQuinzena(lancamentos, quinzena) {
-  return lancamentos
-    .filter((lancamento) => quinzenaDoDia(lancamento.dia) === quinzena)
-    .sort((a, b) => pesoDoTipo(a) - pesoDoTipo(b) || a.dia - b.dia);
+  return ordenarParaExibicao(lancamentos.filter((lancamento) => quinzenaDoDia(lancamento.dia) === quinzena));
+}
+
+/** Lançamentos com dia dentro do intervalo, na mesma ordem de exibição das quinzenas. */
+export function lancamentosDoIntervalo(lancamentos, { primeiroDia, ultimoDia }) {
+  return ordenarParaExibicao(lancamentos.filter(({ dia }) => dia >= primeiroDia && dia <= ultimoDia));
+}
+
+function ordenarParaExibicao(lancamentos) {
+  return [...lancamentos].sort((a, b) => pesoDoTipo(a) - pesoDoTipo(b) || a.dia - b.dia);
 }
 
 function pesoDoTipo(lancamento) {

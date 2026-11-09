@@ -1,7 +1,8 @@
 // Preferências da pessoa (controle, tema, idioma e moeda), guardadas no aparelho.
 // O armazenamento é injetado (localStorage no app, memória nos testes).
+import { MODO } from '../dominio/orcamento.js';
 
-export const MODO = Object.freeze({ MENSAL: 'mensal', QUINZENAL: 'quinzenal' });
+export { MODO };
 export const TEMA = Object.freeze({ CLARO: 'claro', ESCURO: 'escuro' });
 export const IDIOMA = Object.freeze({ PORTUGUES: 'pt-BR', ESPANHOL: 'es-ES', INGLES: 'en-US' });
 export const MOEDA = Object.freeze({ REAL: 'BRL', EURO: 'EUR', DOLAR: 'USD' });

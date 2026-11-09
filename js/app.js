@@ -1,18 +1,18 @@
 // Ponto de composição: cria as dependências, liga a interface às regras e guarda o estado da tela.
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
-import { criarPreferencias } from './dados/preferencias.js';
+import { MODO, criarPreferencias } from './dados/preferencias.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
 import { compararMeses } from './dominio/comparacaoDeMeses.js';
 import { resumirContasAPagar } from './dominio/contasAPagar.js';
 import {
   ErroLancamentoInvalido, adicionarLancamento, alterarLancamento, copiarLancamentosParaMes, criarLancamento,
-  deslocarMes, intervaloDaQuinzena, mesesSeguintes, quinzenaDoDia, removerLancamento, resumirAno,
+  deslocarMes, mesesSeguintes, periodoDoDia, removerLancamento, resumirAno,
 } from './dominio/orcamento.js';
+import { aplicarTextosNaPagina, criarLocalizacao } from './i18n/localizacao.js';
 import { criarAviso } from './ui/aviso.js';
 import { criarDialogoCopia } from './ui/dialogoCopia.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
-import { nomeDoMes } from './ui/formatacao.js';
-import { criarGradeQuinzenas } from './ui/gradeQuinzenas.js';
+import { criarGradeDoMes } from './ui/gradeDoMes.js';
 import { criarMenuLateral } from './ui/menuLateral.js';
 import { criarPainelAnual } from './ui/painelAnual.js';
 import { criarPainelComparacao } from './ui/painelComparacao.js';
@@ -22,54 +22,69 @@ import { criarSeletorDeMes } from './ui/seletorDeMes.js';
 const MESES_OFERECIDOS_NA_COPIA = 12;
 
 const hoje = new Date();
-const estado = {
-  ano: hoje.getFullYear(),
-  mes: hoje.getMonth(),
-  quinzena: quinzenaDoDia(hoje.getDate()),
-  anoDoPainel: hoje.getFullYear(),
-  tela: 'mes',
-};
-
 const armazenamento = obterArmazenamentoDoAparelho();
 const repositorio = criarRepositorioOrcamento({
   armazenamento,
-  criarAnoInicial: (ano) => criarAnoConformePlanilha(ano, gerarId),
+  criarAnoInicial: (ano) => criarAnoConformePlanilha(ano, gerarId, modeloDoAnoNovo()),
 });
 const preferencias = criarPreferencias({
   armazenamento,
   idiomasDoAparelho: navigator.languages ?? [navigator.language],
   jaUsavaOApp: repositorio.existeAnoSalvo(hoje.getFullYear()) || repositorio.existeAnoSalvo(hoje.getFullYear() - 1),
 });
+const local = criarLocalizacao(preferencias.obter());
+
+const estado = {
+  ano: hoje.getFullYear(),
+  mes: hoje.getMonth(),
+  periodo: periodoDoDia(modoDeControle(), hoje.getDate()),
+  anoDoPainel: hoje.getFullYear(),
+  tela: 'mes',
+};
 
 const seletorDeMes = criarSeletorDeMes(document.getElementById('seletor-mes'), {
+  local,
   aoSelecionarMes: selecionarMes,
   aoTrocarAno: trocarAno,
 });
-const grade = criarGradeQuinzenas(document.getElementById('quinzenas'), {
+const grade = criarGradeDoMes(document.getElementById('grade-do-mes'), {
+  local,
   aoAlterarValor: (id, valorCentavos) => atualizarLancamento(id, { valorCentavos }),
   aoAlterarDescricao: (id, descricao) => atualizarLancamento(id, { descricao }),
   aoMarcarPagamento: marcarPagamento,
   aoExcluir: excluirLancamento,
   aoAdicionar: incluirLancamento,
-  aoTrocarQuinzena: trocarQuinzena,
+  aoTrocarPeriodo: trocarPeriodo,
 });
 const painelContas = criarPainelContasAPagar(document.getElementById('painel-contas'), {
+  local,
   aoTrocarMes: trocarMesNaTela,
   aoMarcarPagamento: marcarPagamento,
 });
 const painelComparacao = criarPainelComparacao(document.getElementById('painel-comparacao'), {
+  local,
   aoTrocarMes: trocarMesNaTela,
 });
+const painelAnual = criarPainelAnual(document.getElementById('painel-anual'), { local, aoTrocarAno: trocarAnoDoPainel });
 const menuLateral = criarMenuLateral(document.getElementById('menu-lateral'), document.getElementById('botao-menu'), {
   aoEscolherTela: abrirTela,
   aoAlterarPreferencia: alterarPreferencia,
 });
-const painelAnual = criarPainelAnual(document.getElementById('painel-anual'), { aoTrocarAno: trocarAnoDoPainel });
-const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'));
-const dialogoCopia = criarDialogoCopia(document.getElementById('dialogo-copia'));
+const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'), { local });
+const dialogoCopia = criarDialogoCopia(document.getElementById('dialogo-copia'), { local });
 const aviso = criarAviso(document.getElementById('aviso'));
 const tituloDoMes = document.getElementById('titulo-mes');
 document.getElementById('botao-copiar-mes').addEventListener('click', copiarMesParaSeguintes);
+
+/** Enquanto a pessoa não escolheu, o app mostra o modo quinzenal (o de quem já usava). */
+function modoDeControle() {
+  return preferencias.obter().modo ?? MODO.QUINZENAL;
+}
+
+/** Anos ainda não abertos nascem no idioma e no modo atuais. */
+function modeloDoAnoNovo() {
+  return { idioma: preferencias.obter().idioma, modo: modoDeControle() };
+}
 
 function lancamentosDoMes() {
   return repositorio.obterMes(estado.ano, estado.mes);
@@ -86,17 +101,18 @@ function renderizarMes() {
     mesSelecionado: estado.mes,
     mesAtual: ehAnoAtual ? hoje.getMonth() : undefined,
   });
-  tituloDoMes.textContent = `${nomeDoMes(estado.mes)} de ${estado.ano}`;
+  tituloDoMes.textContent = local.mesEAno(estado);
   grade.renderizar({
+    modo: modoDeControle(),
     ano: estado.ano,
     mes: estado.mes,
     lancamentos: lancamentosDoMes(),
-    quinzenaAtiva: estado.quinzena,
+    periodoAtivo: estado.periodo,
   });
 }
 
-function trocarQuinzena(quinzena) {
-  estado.quinzena = quinzena;
+function trocarPeriodo(periodo) {
+  estado.periodo = periodo;
   renderizarMes();
 }
 
@@ -113,7 +129,7 @@ async function copiarMesParaSeguintes() {
     const copia = copiarLancamentosParaMes(lancamentosDaOrigem, { origem, destino, gerarId });
     repositorio.salvarMes(destino.ano, destino.mes, copia);
   }
-  aviso.mostrar(destinos.length === 1 ? '1 mês recebeu a cópia.' : `${destinos.length} meses receberam a cópia.`);
+  aviso.mostrar(local.t('copia.concluida', { n: destinos.length }));
 }
 
 function renderizarContas() {
@@ -173,13 +189,13 @@ function marcarPagamento(id, pago) {
 
 function excluirLancamento(id) {
   const lancamento = lancamentosDoMes().find((item) => item.id === id);
-  if (!window.confirm(`Excluir "${lancamento.descricao}"?`)) return;
+  if (!window.confirm(local.t('lancamento.confirmarExclusao', { descricao: lancamento.descricao }))) return;
   salvarMes(removerLancamento(lancamentosDoMes(), id));
   renderizarMes();
 }
 
-async function incluirLancamento(tipo, quinzena) {
-  const intervalo = intervaloDaQuinzena(quinzena, estado.ano, estado.mes);
+/** @param {{ primeiroDia: number, ultimoDia: number }} intervalo dias do período onde o botão foi tocado */
+async function incluirLancamento(tipo, intervalo) {
   const digitado = await dialogoLancamento.abrir({ tipo, intervalo, diaSugerido: intervalo.primeiroDia });
   if (!digitado) return;
 
@@ -190,7 +206,7 @@ async function incluirLancamento(tipo, quinzena) {
     renderizarMes();
   } catch (erro) {
     if (!(erro instanceof ErroLancamentoInvalido)) throw erro;
-    window.alert('Preencha a descrição do lançamento.');
+    window.alert(local.t('dialogo.erroDescricao'));
   }
 }
 
@@ -219,10 +235,16 @@ function renderizarTelaAtual() {
 
 function alterarPreferencia(nome, valor) {
   aplicarPreferencias(preferencias.alterar({ [nome]: valor }));
+  renderizarTelaAtual();
 }
 
+/** Tema, idioma, moeda e modo valem para a página inteira: textos fixos, menu e tela aberta. */
 function aplicarPreferencias(atuais) {
   document.documentElement.dataset.tema = atuais.tema;
+  document.documentElement.lang = atuais.idioma;
+  local.configurar(atuais);
+  document.getElementById('descricao-lancamentos').dataset.i18n = `menu.lancamentos.${modoDeControle()}`;
+  aplicarTextosNaPagina(document, local);
   menuLateral.marcarPreferencias(atuais);
 }
 

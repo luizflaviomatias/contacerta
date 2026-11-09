@@ -1,10 +1,9 @@
-import { nomeDoMes } from './formatacao.js';
 
 /**
  * Janela para escolher para quais meses seguintes copiar o mês aberto.
  * `abrir` devolve uma Promise com os meses marcados ({ ano, mes }[]), ou `undefined` se a pessoa cancelar.
  */
-export function criarDialogoCopia(dialogo) {
+export function criarDialogoCopia(dialogo, { local }) {
   const formulario = dialogo.querySelector('form');
   const titulo = dialogo.querySelector('[data-campo="titulo"]');
   const listaDeMeses = dialogo.querySelector('[data-campo="meses"]');
@@ -17,7 +16,7 @@ export function criarDialogoCopia(dialogo) {
     if (evento.submitter?.value === 'cancelar') return fechar(undefined);
     const marcados = opcoesAbertas.filter((_, indice) => formulario.elements[`mes-${indice}`].checked);
     if (marcados.length === 0) {
-      erro.textContent = 'Marque pelo menos um mês.';
+      erro.textContent = local.t('copia.erroNenhumMes');
       return;
     }
     fechar(marcados.map(({ ano, mes }) => ({ ano, mes })));
@@ -32,12 +31,12 @@ export function criarDialogoCopia(dialogo) {
   /** @param {{ origem: {ano:number, mes:number}, opcoes: Array<{ano:number, mes:number, marcado:boolean}> }} dados */
   function abrir({ origem, opcoes }) {
     opcoesAbertas = opcoes;
-    titulo.textContent = `Copiar ${nomeDoMes(origem.mes)} ${origem.ano}`;
+    titulo.textContent = local.t('copia.titulo', { mes: local.mesEAno(origem) });
     erro.textContent = '';
     listaDeMeses.innerHTML = opcoes.map(({ ano, mes, marcado }, indice) => `
       <label class="opcao-mes">
         <input type="checkbox" name="mes-${indice}" ${marcado ? 'checked' : ''}>
-        <span>${nomeDoMes(mes)} ${ano}</span>
+        <span>${local.mesEAno({ ano, mes })}</span>
       </label>`).join('');
     dialogo.showModal();
     return new Promise((resolver) => { resolverAberto = resolver; });
