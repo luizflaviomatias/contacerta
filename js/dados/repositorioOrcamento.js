@@ -3,11 +3,21 @@ import { MESES_NO_ANO, criarLancamento } from '../dominio/orcamento.js';
 
 // Nome antigo do app mantido de propósito: trocar a chave apagaria os lançamentos de quem já usa.
 const PREFIXO_DA_CHAVE = 'orcamento-quinzenal:ano:';
+const SUFIXO_DA_COPIA_CORROMPIDA = ':corrompido';
 
 export class ErroArmazenamento extends Error {
   constructor(mensagem, causa) {
     super(mensagem, { cause: causa });
     this.name = 'ErroArmazenamento';
+  }
+}
+
+/** O ano salvo não pôde ser lido; `ano` diz qual, para a tela oferecer recomeçar só ele. */
+export class ErroAnoCorrompido extends ErroArmazenamento {
+  constructor(ano, causa) {
+    super(`Dados salvos do ano ${ano} estão corrompidos`, causa);
+    this.name = 'ErroAnoCorrompido';
+    this.ano = ano;
   }
 }
 
@@ -25,22 +35,37 @@ export function criarRepositorioOrcamento({ armazenamento, criarAnoInicial }) {
 
   function lerOuCriarAno(ano) {
     const salvo = armazenamento.getItem(chaveDoAno(ano));
-    if (salvo !== null) return desserializarAno(ano, salvo);
+    return salvo === null ? criarEGravarAno(ano) : desserializarAno(ano, salvo);
+  }
+
+  function criarEGravarAno(ano) {
     const anoInicial = criarAnoInicial(ano);
     gravarAno(ano, anoInicial);
     return anoInicial;
   }
 
+  /** Grava primeiro e só então atualiza a memória: se a gravação falhar, a tela não mostra algo que não foi salvo. */
   function salvarMes(ano, mes, lancamentos) {
     const meses = [...obterAno(ano)];
     meses[mes] = lancamentos;
-    anosCarregados.set(ano, meses);
     gravarAno(ano, meses);
+    anosCarregados.set(ano, meses);
+  }
+
+  /** Guarda o conteúdo ilegível numa chave à parte (para não perdê-lo de vez) e cria o ano do zero. */
+  function recomecarAno(ano) {
+    const conteudoAntigo = armazenamento.getItem(chaveDoAno(ano));
+    if (conteudoAntigo !== null) gravar(chaveDoAno(ano) + SUFIXO_DA_COPIA_CORROMPIDA, conteudoAntigo, ano);
+    anosCarregados.set(ano, criarEGravarAno(ano));
   }
 
   function gravarAno(ano, meses) {
+    gravar(chaveDoAno(ano), JSON.stringify(meses), ano);
+  }
+
+  function gravar(chave, conteudo, ano) {
     try {
-      armazenamento.setItem(chaveDoAno(ano), JSON.stringify(meses));
+      armazenamento.setItem(chave, conteudo);
     } catch (erro) {
       throw new ErroArmazenamento(`Não foi possível salvar o ano ${ano}`, erro);
     }
@@ -51,6 +76,7 @@ export function criarRepositorioOrcamento({ armazenamento, criarAnoInicial }) {
     obterMes: (ano, mes) => obterAno(ano)[mes],
     obterAno,
     salvarMes,
+    recomecarAno,
   };
 }
 
@@ -64,6 +90,6 @@ function desserializarAno(ano, json) {
     if (!Array.isArray(meses) || meses.length !== MESES_NO_ANO) throw new Error('formato inesperado');
     return meses.map((lancamentos) => lancamentos.map(criarLancamento));
   } catch (erro) {
-    throw new ErroArmazenamento(`Dados salvos do ano ${ano} estão corrompidos`, erro);
+    throw new ErroAnoCorrompido(ano, erro);
   }
 }
