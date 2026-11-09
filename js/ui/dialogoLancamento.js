@@ -2,7 +2,8 @@ import { ErroValorInvalido } from '../dominio/dinheiro.js';
 import { TIPO } from '../dominio/orcamento.js';
 
 /**
- * Janela para incluir um recebimento ou gasto.
+ * Janela para incluir um recebimento ou gasto. Descrição e valor são conferidos aqui mesmo:
+ * se algo estiver errado, a janela continua aberta com o que a pessoa digitou e mostra o motivo.
  * `abrir` devolve uma Promise com os dados digitados, ou `undefined` se a pessoa cancelar.
  */
 export function criarDialogoLancamento(dialogo, { local }) {
@@ -20,6 +21,7 @@ export function criarDialogoLancamento(dialogo, { local }) {
   formulario.addEventListener('submit', (evento) => {
     evento.preventDefault();
     if (evento.submitter?.value === 'cancelar') return fechar(undefined);
+    if (campos.descricao.value.trim() === '') return mostrarErro(local.t('dialogo.erroDescricao'), campos.descricao);
     try {
       fechar({
         descricao: campos.descricao.value,
@@ -28,11 +30,15 @@ export function criarDialogoLancamento(dialogo, { local }) {
       });
     } catch (erro) {
       if (!(erro instanceof ErroValorInvalido)) throw erro;
-      campos.erro.textContent = local.t('dialogo.erroValor', { exemplo: local.valorDeExemplo() });
-      campos.valor.focus();
+      mostrarErro(local.t('dialogo.erroValor', { exemplo: local.valorDeExemplo() }), campos.valor);
     }
   });
   dialogo.addEventListener('cancel', () => resolverAberto(undefined));
+
+  function mostrarErro(texto, campo) {
+    campos.erro.textContent = texto;
+    campo.focus();
+  }
 
   function fechar(resultado) {
     dialogo.close();

@@ -1,11 +1,15 @@
 // Deixa o app abrir sem internet. Ao publicar uma nova versão, troque VERSAO_DO_CACHE.
-const VERSAO_DO_CACHE = 'contacerta-v2';
+const VERSAO_DO_CACHE = 'contacerta-v3';
 const ARQUIVOS_DO_APP = [
   './',
   './index.html',
   './manifest.webmanifest',
   './css/app.css',
   './js/app.js',
+  './js/acoesDoMes.js',
+  './js/ambiente.js',
+  './js/navegacao.js',
+  './js/tratamentoDeErros.js',
   './js/dominio/dinheiro.js',
   './js/dominio/orcamento.js',
   './js/dominio/contasAPagar.js',
@@ -16,6 +20,8 @@ const ARQUIVOS_DO_APP = [
   './js/ui/seletorDeIdioma.js',
   './js/ui/telaBoasVindas.js',
   './js/ui/dialogoCopia.js',
+  './js/ui/dialogoConfirmacao.js',
+  './js/ui/seletorDeModo.js',
   './js/ui/aviso.js',
   './js/ui/dialogoLancamento.js',
   './js/ui/formatacao.js',

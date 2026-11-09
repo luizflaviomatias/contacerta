@@ -127,4 +127,16 @@ export default {
   'anual.gastosPorMes': 'Expenses by month',
   'anual.gastosPorCategoria': 'Expenses by category',
   'anual.nenhumGasto': 'No expenses this year',
+
+  'visualizacao.atual': 'View: {modo}',
+  'visualizacao.mensal': 'Month',
+  'visualizacao.quinzenal': 'Half',
+  'visualizacao.trocarParaMensal': 'Tap to see the whole month',
+  'visualizacao.trocarParaQuinzenal': 'Tap to see each half of the month',
+
+  'confirmacao.excluir': 'Delete',
+  'erro.salvar': 'Could not save. Check that the device has free space and try again.',
+  'erro.anoCorrompido': 'The data for {ano} is damaged and could not be opened. Start {ano} over? A copy of the old data is kept on the device.',
+  'erro.recomecarAno': 'Start {ano} over',
+  'erro.anoIndisponivel': 'The data for {ano} could not be opened.',
 };

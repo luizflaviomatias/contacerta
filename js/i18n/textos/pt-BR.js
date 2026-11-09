@@ -127,4 +127,16 @@ export default {
   'anual.gastosPorMes': 'Gastos por mês',
   'anual.gastosPorCategoria': 'Gastos por categoria',
   'anual.nenhumGasto': 'Nenhum gasto no ano',
+
+  'visualizacao.atual': 'Visualização: {modo}',
+  'visualizacao.mensal': 'Mês',
+  'visualizacao.quinzenal': 'Quinzena',
+  'visualizacao.trocarParaMensal': 'Tocar para ver o mês inteiro',
+  'visualizacao.trocarParaQuinzenal': 'Tocar para ver por quinzena',
+
+  'confirmacao.excluir': 'Excluir',
+  'erro.salvar': 'Não foi possível salvar. Veja se o aparelho tem espaço livre e tente de novo.',
+  'erro.anoCorrompido': 'Os dados de {ano} estão danificados e não puderam ser abertos. Quer recomeçar {ano} do zero? Uma cópia dos dados antigos fica guardada no aparelho.',
+  'erro.recomecarAno': 'Recomeçar {ano}',
+  'erro.anoIndisponivel': 'Os dados de {ano} não puderam ser abertos.',
 };

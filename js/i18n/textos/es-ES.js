@@ -127,4 +127,16 @@ export default {
   'anual.gastosPorMes': 'Gastos por mes',
   'anual.gastosPorCategoria': 'Gastos por categoría',
   'anual.nenhumGasto': 'Ningún gasto en el año',
+
+  'visualizacao.atual': 'Vista: {modo}',
+  'visualizacao.mensal': 'Mes',
+  'visualizacao.quinzenal': 'Quincena',
+  'visualizacao.trocarParaMensal': 'Toca para ver el mes entero',
+  'visualizacao.trocarParaQuinzenal': 'Toca para ver por quincena',
+
+  'confirmacao.excluir': 'Eliminar',
+  'erro.salvar': 'No se ha podido guardar. Comprueba que el dispositivo tiene espacio libre e inténtalo de nuevo.',
+  'erro.anoCorrompido': 'Los datos de {ano} están dañados y no se han podido abrir. ¿Quieres empezar {ano} de cero? Se guarda una copia de los datos antiguos en el dispositivo.',
+  'erro.recomecarAno': 'Empezar {ano} de cero',
+  'erro.anoIndisponivel': 'No se han podido abrir los datos de {ano}.',
 };
