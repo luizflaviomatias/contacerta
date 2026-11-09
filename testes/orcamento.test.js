@@ -96,3 +96,18 @@ test('resumo anual de ano vazio não divide por zero', () => {
   assert.equal(resumo.percentualComprometido, 0);
   assert.equal(resumo.maiorCategoria.totalCentavos, 0);
 });
+
+test('lançamento novo nasce não pago e pode ser marcado como pago', () => {
+  const lista = [despesa(100)];
+  assert.equal(lista[0].pago, false);
+  const paga = alterarLancamento(lista, lista[0].id, { pago: true });
+  assert.equal(paga[0].pago, true);
+  assert.equal(lista[0].pago, false);
+});
+
+test('rejeita marca de pago que não seja verdadeiro ou falso', () => {
+  assert.throws(
+    () => criarLancamento({ id: 'x', descricao: 'Luz', tipo: TIPO.DESPESA, valorCentavos: 1, dia: 1, pago: 'sim' }),
+    ErroLancamentoInvalido,
+  );
+});

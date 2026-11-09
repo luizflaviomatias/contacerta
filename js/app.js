@@ -10,6 +10,7 @@ import { criarDialogoCopia } from './ui/dialogoCopia.js';
 import { criarDialogoLancamento } from './ui/dialogoLancamento.js';
 import { criarGradeQuinzenas } from './ui/gradeQuinzenas.js';
 import { criarPainelAnual } from './ui/painelAnual.js';
+import { nomeDoMes } from './ui/formatacao.js';
 import { criarSeletorDeMes } from './ui/seletorDeMes.js';
 
 const MESES_OFERECIDOS_NA_COPIA = 12;
@@ -34,6 +35,7 @@ const seletorDeMes = criarSeletorDeMes(document.getElementById('seletor-mes'), {
 const grade = criarGradeQuinzenas(document.getElementById('quinzenas'), {
   aoAlterarValor: (id, valorCentavos) => atualizarLancamento(id, { valorCentavos }),
   aoAlterarDescricao: (id, descricao) => atualizarLancamento(id, { descricao }),
+  aoMarcarPagamento: marcarPagamento,
   aoExcluir: excluirLancamento,
   aoAdicionar: incluirLancamento,
   aoTrocarQuinzena: trocarQuinzena,
@@ -42,6 +44,7 @@ const painelAnual = criarPainelAnual(document.getElementById('painel-anual'), { 
 const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'));
 const dialogoCopia = criarDialogoCopia(document.getElementById('dialogo-copia'));
 const aviso = criarAviso(document.getElementById('aviso'));
+const tituloDoMes = document.getElementById('titulo-mes');
 document.getElementById('botao-copiar-mes').addEventListener('click', copiarMesParaSeguintes);
 
 function lancamentosDoMes() {
@@ -59,6 +62,7 @@ function renderizarMes() {
     mesSelecionado: estado.mes,
     mesAtual: ehAnoAtual ? hoje.getMonth() : undefined,
   });
+  tituloDoMes.textContent = `${nomeDoMes(estado.mes)} de ${estado.ano}`;
   grade.renderizar({
     ano: estado.ano,
     mes: estado.mes,
@@ -116,6 +120,12 @@ function atualizarLancamento(id, alteracoes) {
     if (!(erro instanceof ErroLancamentoInvalido)) throw erro;
     renderizarMes();
   }
+}
+
+/** Redesenha o mês porque marcar ou desmarcar trava ou libera a linha inteira. */
+function marcarPagamento(id, pago) {
+  salvarMes(alterarLancamento(lancamentosDoMes(), id, { pago }));
+  renderizarMes();
 }
 
 function excluirLancamento(id) {

@@ -1,5 +1,6 @@
 import { formatarMoeda } from '../dominio/dinheiro.js';
 import { escaparHtml, nomeDoMes } from './formatacao.js';
+import { ICONE } from './icones.js';
 
 /** Aba anual em "big numbers". */
 export function criarPainelAnual(container, { aoTrocarAno }) {
@@ -12,9 +13,9 @@ export function criarPainelAnual(container, { aoTrocarAno }) {
   function renderizar({ ano, resumo }) {
     container.innerHTML = `
       <div class="seletor-mes__cabecalho">
-        <button class="botao-icone" data-acao="ano-anterior" aria-label="Ano anterior">‹</button>
+        <button class="botao-icone" data-acao="ano-anterior" aria-label="Ano anterior">${ICONE.anterior}</button>
         <h2 class="seletor-mes__titulo">Visão anual ${ano}</h2>
-        <button class="botao-icone" data-acao="ano-seguinte" aria-label="Próximo ano">›</button>
+        <button class="botao-icone" data-acao="ano-seguinte" aria-label="Próximo ano">${ICONE.seguinte}</button>
       </div>
       <div class="big-numbers">
         ${numeroGrande('Gasto no ano', formatarMoeda(resumo.gasto), 'destaque')}

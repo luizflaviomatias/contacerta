@@ -3,6 +3,7 @@ import {
   QUINZENA, TIPO, intervaloDaQuinzena, lancamentosDaQuinzena, totalizar,
 } from '../dominio/orcamento.js';
 import { escaparHtml } from './formatacao.js';
+import { ICONE } from './icones.js';
 
 const QUINZENAS = [
   { quinzena: QUINZENA.PRIMEIRA, titulo: '1ª quinzena' },
@@ -12,6 +13,7 @@ const QUINZENAS = [
 /**
  * Grade do mês com a 1ª e a 2ª quinzena em abas.
  * Ao digitar um valor, só os totais são redesenhados — o campo em edição mantém o foco.
+ * Gasto marcado como pago fica riscado e travado até ser desmarcado.
  */
 export function criarGradeQuinzenas(container, acoes) {
   container.addEventListener('input', (evento) => {
@@ -21,6 +23,7 @@ export function criarGradeQuinzenas(container, acoes) {
     const campo = evento.target;
     if (campo.matches('.campo-valor')) reformatarValor(campo);
     if (campo.matches('.campo-descricao')) acoes.aoAlterarDescricao(idDaLinha(campo), campo.value);
+    if (campo.matches('.campo-pago')) acoes.aoMarcarPagamento(idDaLinha(campo), campo.checked);
   });
   container.addEventListener('click', (evento) => {
     const botao = evento.target.closest('button[data-acao]');
@@ -121,19 +124,21 @@ function cartaoDaQuinzena({ quinzena, titulo, ano, mes, lancamentos }) {
       ${grupoDeLancamentos({ titulo: 'Gastos', tipo: TIPO.DESPESA, quinzena, itens: doTipo(TIPO.DESPESA) })}
       <footer class="quinzena__rodape">
         ${blocoDeTotal('Recebido', `${quinzena}-recebido`)}
-        ${blocoDeTotal('Total', `${quinzena}-gasto`)}
+        ${blocoDeTotal('Gasto', `${quinzena}-gasto`)}
         ${blocoDeTotal('Saldo', `${quinzena}-saldo`)}
       </footer>
     </section>`;
 }
 
 function grupoDeLancamentos({ titulo, tipo, quinzena, itens }) {
-  const rotuloDoBotao = tipo === TIPO.RECEITA ? '+ Recebimento' : '+ Gasto';
+  const rotuloDoBotao = tipo === TIPO.RECEITA ? 'Recebimento' : 'Gasto';
   return `
     <div class="grupo grupo--${tipo}">
       <div class="grupo__cabecalho">
         <h4>${titulo}</h4>
-        <button class="botao-texto" data-acao="adicionar" data-tipo="${tipo}" data-quinzena="${quinzena}">${rotuloDoBotao}</button>
+        <button class="botao-adicionar" data-acao="adicionar" data-tipo="${tipo}" data-quinzena="${quinzena}">
+          ${ICONE.mais}<span>${rotuloDoBotao}</span>
+        </button>
       </div>
       <ul class="lista-lancamentos">
         ${itens.length === 0 ? '<li class="lista-vazia">Nenhum lançamento</li>' : ''}
@@ -142,13 +147,29 @@ function grupoDeLancamentos({ titulo, tipo, quinzena, itens }) {
     </div>`;
 }
 
-function linhaDoLancamento({ id, descricao, valorCentavos, dia }) {
+function linhaDoLancamento(lancamento) {
+  const { id, descricao, valorCentavos, dia, pago } = lancamento;
+  const nome = escaparHtml(descricao);
+  const travado = estaPago(lancamento) ? 'disabled' : '';
   return `
-    <li class="lancamento" data-id="${escaparHtml(id)}">
-      <span class="lancamento__dia" title="Dia do lançamento">${dia}</span>
-      <input class="campo-descricao" value="${escaparHtml(descricao)}" aria-label="Descrição" enterkeyhint="done">
+    <li class="lancamento ${estaPago(lancamento) ? 'lancamento--pago' : ''}" data-id="${escaparHtml(id)}">
+      ${ehGasto(lancamento) ? caixaDePago(nome, pago) : '<span class="lancamento__marcador" aria-hidden="true"></span>'}
+      <input class="campo-descricao" value="${nome}" aria-label="Descrição" enterkeyhint="done" ${travado}>
+      <span class="lancamento__dia">Dia ${dia}</span>
       <input class="campo-valor" value="${formatarParaEdicao(valorCentavos)}" inputmode="decimal"
-             aria-label="Valor de ${escaparHtml(descricao)}" enterkeyhint="done">
-      <button class="botao-icone botao-excluir" data-acao="excluir" aria-label="Excluir ${escaparHtml(descricao)}">✕</button>
+             aria-label="Valor de ${nome}" enterkeyhint="done" ${travado}>
+      <button class="botao-icone botao-excluir" data-acao="excluir" aria-label="Excluir ${nome}" ${travado}>${ICONE.excluir}</button>
     </li>`;
+}
+
+function caixaDePago(nome, pago) {
+  return `<input type="checkbox" class="campo-pago" aria-label="${nome} pago" ${pago ? 'checked' : ''}>`;
+}
+
+function ehGasto(lancamento) {
+  return lancamento.tipo === TIPO.DESPESA;
+}
+
+function estaPago(lancamento) {
+  return ehGasto(lancamento) && lancamento.pago;
 }

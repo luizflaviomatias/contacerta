@@ -44,3 +44,9 @@ test('recusa copiar para o mesmo mês ou para mês anterior', () => {
     );
   }
 });
+
+test('gasto pago chega desmarcado no mês seguinte', () => {
+  const aluguelPago = criarLancamento({ ...aluguel, pago: true });
+  const [copia] = copiarLancamentosParaMes([aluguelPago], { origem: NOVEMBRO_2026, destino: { ano: 2026, mes: 11 }, gerarId });
+  assert.equal(copia.pago, false);
+});

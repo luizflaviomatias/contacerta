@@ -38,3 +38,15 @@ test('dados corrompidos geram erro com contexto', () => {
   const repositorio = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio });
   assert.throws(() => repositorio.obterAno(2026), ErroArmazenamento);
 });
+
+test('lançamento salvo antes da marca de pago é lido como não pago', () => {
+  const { pago, ...gastoAntigo } = gasto;
+  const meses = anoVazio();
+  meses[10] = [gastoAntigo];
+  const armazenamento = criarArmazenamentoEmMemoria({ 'orcamento-quinzenal:ano:2026': JSON.stringify(meses) });
+
+  const [lido] = criarRepositorioOrcamento({ armazenamento, criarAnoInicial: anoVazio }).obterMes(2026, 10);
+
+  assert.equal(pago, false);
+  assert.equal(lido.pago, false);
+});

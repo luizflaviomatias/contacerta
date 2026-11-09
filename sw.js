@@ -1,5 +1,5 @@
 // Deixa o app abrir sem internet. Ao publicar uma nova versão, troque VERSAO_DO_CACHE.
-const VERSAO_DO_CACHE = 'orcamento-quinzenal-v3';
+const VERSAO_DO_CACHE = 'orcamento-quinzenal-v4';
 const ARQUIVOS_DO_APP = [
   './',
   './index.html',
@@ -16,6 +16,7 @@ const ARQUIVOS_DO_APP = [
   './js/ui/dialogoLancamento.js',
   './js/ui/formatacao.js',
   './js/ui/gradeQuinzenas.js',
+  './js/ui/icones.js',
   './js/ui/painelAnual.js',
   './icones/icone-180.png',
   './icones/icone-192.png',

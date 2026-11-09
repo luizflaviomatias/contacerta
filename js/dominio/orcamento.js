@@ -58,17 +58,20 @@ export function ehMesPosterior(mes, referencia) {
 /**
  * Cópias (com ids novos) dos lançamentos de `origem` para `destino`, que precisa ser um mês seguinte.
  * Dias que não existem no destino (ex.: 30 em fevereiro) vão para o último dia do mês.
+ * As cópias chegam como não pagas: o pagamento de um mês não quita o do outro.
  */
 export function copiarLancamentosParaMes(lancamentos, { origem, destino, gerarId }) {
   if (!ehMesPosterior(destino, origem)) throw new ErroCopiaParaMesAnterior(origem, destino);
   return lancamentos.map((lancamento) => criarLancamento({
     ...lancamento,
     id: gerarId(),
+    pago: false,
     dia: limitarDiaAoMes(lancamento.dia, destino.ano, destino.mes),
   }));
 }
 
-export function criarLancamento({ id, descricao, tipo, valorCentavos, dia }) {
+/** `pago` marca o gasto já quitado; dados salvos antes dessa marca chegam sem ela e valem como não pagos. */
+export function criarLancamento({ id, descricao, tipo, valorCentavos, dia, pago = false }) {
   const descricaoLimpa = String(descricao ?? '').trim();
   if (!id) throw new ErroLancamentoInvalido('id ausente');
   if (descricaoLimpa === '') throw new ErroLancamentoInvalido('descrição vazia');
@@ -79,7 +82,8 @@ export function criarLancamento({ id, descricao, tipo, valorCentavos, dia }) {
   if (!Number.isInteger(dia) || dia < 1 || dia > MAIOR_DIA_POSSIVEL) {
     throw new ErroLancamentoInvalido(`dia ${dia}`);
   }
-  return Object.freeze({ id, descricao: descricaoLimpa, tipo, valorCentavos, dia });
+  if (typeof pago !== 'boolean') throw new ErroLancamentoInvalido(`marca de pago ${pago}`);
+  return Object.freeze({ id, descricao: descricaoLimpa, tipo, valorCentavos, dia, pago });
 }
 
 export function adicionarLancamento(lancamentos, novoLancamento) {
