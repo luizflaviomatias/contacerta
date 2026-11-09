@@ -7,7 +7,7 @@ Funciona em Android e iOS e abre sem internet; os dados ficam salvos no próprio
 
 ```bash
 npm start   # http://localhost:5173
-npm test    # testes do domínio
+npm test    # todos os testes (regras, dados, traduções e telas)
 ```
 
 ## Instalar no celular
@@ -58,5 +58,9 @@ Sem Mac, o iPhone usa a versão web: Safari → Compartilhar → *Adicionar à T
 - `js/dominio/` — regras puras: dinheiro em centavos, períodos do mês, totais e relatórios.
 - `js/dados/` — preferências, categorias iniciais da planilha e repositório (localStorage injetado).
 - `js/i18n/` — textos em pt-BR, es-ES e en-US, nomes de meses e formato de dinheiro.
-- `js/ui/` — telas e componentes (grade do mês, relatórios, menu, idiomas, janelas).
+- `js/ui/` — telas e componentes (grade do mês, relatórios, menu, idiomas, visualização, janelas).
+- `js/acoesDoMes.js` — incluir, alterar, marcar como pago, excluir e copiar lançamentos.
+- `js/navegacao.js` — troca de telas; `js/tratamentoDeErros.js` — erros de armazenamento na fronteira da tela.
+- `js/ambiente.js` — armazenamento do aparelho, relógio e funcionamento sem internet.
 - `js/app.js` — ponto de composição e estado da tela.
+- `testes/` — regras, dados, traduções e telas (página simulada com happy-dom); `npm test` roda tudo.
