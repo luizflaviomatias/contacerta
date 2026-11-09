@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+// A versão vem só do package.json. versionCode = maior*10000 + menor*100 + correção (1.4.0 -> 10400).
+def versaoDoApp = new groovy.json.JsonSlurper().parse(file('../../package.json')).version
+def (versaoMaior, versaoMenor, versaoCorrecao) = versaoDoApp.tokenize('.').collect { it as int }
+
 android {
     namespace "io.github.luizflaviomatias.orcamentoquinzenal"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +11,8 @@ android {
         applicationId "io.github.luizflaviomatias.orcamentoquinzenal"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
-        versionName "1.3"
+        versionCode versaoMaior * 10000 + versaoMenor * 100 + versaoCorrecao
+        versionName versaoDoApp
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

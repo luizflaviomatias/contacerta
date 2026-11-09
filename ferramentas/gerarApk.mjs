@@ -1,13 +1,15 @@
-// Compila o APK de depuração e copia para a raiz do projeto como OrcamentoQuinzenal.apk.
+// Compila o APK de depuração e copia para a raiz do projeto como OrcamentoQuinzenal-<versão>.apk.
 import { spawnSync } from 'node:child_process';
-import { copyFile } from 'node:fs/promises';
+import { copyFile, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const RAIZ = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const PASTA_ANDROID = resolve(RAIZ, 'android');
 const APK_GERADO = resolve(PASTA_ANDROID, 'app/build/outputs/apk/debug/app-debug.apk');
-const APK_FINAL = resolve(RAIZ, 'OrcamentoQuinzenal.apk');
+
+const { version: versao } = JSON.parse(await readFile(resolve(RAIZ, 'package.json'), 'utf8'));
+const APK_FINAL = resolve(RAIZ, `OrcamentoQuinzenal-${versao}.apk`);
 
 const ehWindows = process.platform === 'win32';
 const gradle = resolve(PASTA_ANDROID, ehWindows ? 'gradlew.bat' : 'gradlew');

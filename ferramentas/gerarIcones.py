@@ -9,15 +9,15 @@ import sys
 import zlib
 from pathlib import Path
 
-COR_FUNDO = (15, 118, 110, 255)
+COR_FUNDO = (91, 45, 181, 255)
 COR_BARRA = (255, 255, 255, 255)
-COR_BARRA_SUAVE = (153, 246, 228, 255)
+COR_BARRA_DESTAQUE = (255, 176, 32, 255)
 TRANSPARENTE = (0, 0, 0, 0)
 
 # Barras em coordenadas relativas ao centro (-0.5 a 0.5), no tamanho cheio (escala 1).
 BARRAS = (
     (COR_BARRA, (-0.23, -0.05), (-0.25, 0.25)),
-    (COR_BARRA_SUAVE, (0.05, 0.23), (-0.08, 0.25)),
+    (COR_BARRA_DESTAQUE, (0.05, 0.23), (-0.08, 0.25)),
 )
 
 TAMANHOS_WEB = (180, 192, 512)

@@ -1,48 +1,62 @@
 /*
- * Identidade visual: fundo claro e calmo, um único azul de confiança para ações e
- * cores com significado fixo — verde = entrou dinheiro / pago, laranja = gasto, vermelho = saldo negativo.
+ * Identidade visual roxa na regra 60-30-10:
+ *  60% neutro  - fundo lilás quase branco e superfícies brancas, onde ficam as listas (respiro e leitura);
+ *  30% roxo    - topo, seletor de meses, aba ativa e resumo do mês (identidade e orientação);
+ *  10% âmbar   - só o que pede ação: mês escolhido, "+ Recebimento/Gasto", Salvar/Copiar.
+ * Cores de significado fixo: verde = entrou / pago, framboesa = gasto, vermelho = saldo negativo.
  * Letras grandes, alto contraste e áreas de toque de no mínimo 48px pensando em quem tem pouca prática.
  */
 :root {
-  --fundo: #f5f7fb;
+  /* neutro (60%) */
+  --fundo: #f7f6fa;
   --superficie: #ffffff;
-  --texto: #1b2333;
-  --texto-suave: #566173;
-  --borda: #e2e7ef;
-  --borda-forte: #c9d1de;
-  --campo: #f3f5f9;
-  --primaria: #2852c7;
-  --primaria-texto: #ffffff;
-  --primaria-suave: #e8eefc;
-  --receita: #17803d;
-  --receita-suave: #e5f4eb;
-  --despesa: #c2410c;
-  --despesa-suave: #fdeee6;
-  --negativo: #c62828;
-  --pago: #17803d;
+  --texto: #1e1a2b;
+  --texto-suave: #5d5770;
+  --borda: #e7e4ef;
+  --borda-forte: #cdc7da;
+  --campo: #f3f1f8;
+  /* roxo (30%) */
+  --roxo: #5b2db5;
+  --sobre-roxo: #ffffff;
+  --sobre-roxo-suave: #ddd2f7;
+  --sobre-roxo-negativo: #ffc2cc;
+  --roxo-texto: #5b2db5;
+  --roxo-suave: #efe9fb;
+  /* destaque (10%) */
+  --destaque: #ffb020;
+  --sobre-destaque: #2b1a00;
+  /* significados */
+  --receita: #15803d;
+  --despesa: #be185d;
+  --negativo: #b91c1c;
+  --pago: #15803d;
+
   --raio: 16px;
   --raio-pequeno: 12px;
-  --sombra: 0 1px 2px rgb(27 35 51 / .05), 0 4px 12px rgb(27 35 51 / .04);
+  --sombra: 0 1px 2px rgb(30 26 43 / .05), 0 4px 12px rgb(30 26 43 / .05);
   --toque: 48px;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fundo: #0f1420;
-    --superficie: #182032;
-    --texto: #e8ecf4;
-    --texto-suave: #a3aec2;
-    --borda: #2a3448;
-    --borda-forte: #3a4660;
-    --campo: #1f2940;
-    --primaria: #8aa8ff;
-    --primaria-texto: #0f1a3d;
-    --primaria-suave: #23305a;
+    --fundo: #14111d;
+    --superficie: #1d1929;
+    --texto: #ece8f6;
+    --texto-suave: #aaa3bf;
+    --borda: #2e2940;
+    --borda-forte: #423b58;
+    --campo: #252036;
+    --roxo: #4f2fa8;
+    --sobre-roxo: #ffffff;
+    --sobre-roxo-suave: #d3c6f5;
+    --sobre-roxo-negativo: #ffb3c0;
+    --roxo-texto: #bba5ff;
+    --roxo-suave: #2c2448;
+    --destaque: #ffb84d;
+    --sobre-destaque: #2b1a00;
     --receita: #5bd08a;
-    --receita-suave: #16352a;
-    --despesa: #ff9e6b;
-    --despesa-suave: #3d2418;
+    --despesa: #ff7eb0;
     --negativo: #ff7b7b;
     --pago: #5bd08a;
     --sombra: none;
@@ -63,7 +77,7 @@ body {
 button, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: default; }
-:focus-visible { outline: 3px solid var(--primaria); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--destaque); outline-offset: 2px; }
 
 .icone { width: 24px; height: 24px; flex: none; }
 
@@ -72,13 +86,13 @@ button:disabled { cursor: default; }
   position: sticky; top: 0; z-index: 2;
   display: flex; align-items: center; gap: 10px;
   padding: calc(env(safe-area-inset-top) + 12px) 16px 12px;
-  background: var(--fundo);
-  border-bottom: 1px solid var(--borda);
+  background: var(--roxo);
+  color: var(--sobre-roxo);
 }
 .topo h1 { margin: 0; font-size: 1.2rem; font-weight: 700; letter-spacing: -.01em; }
 .topo__marca {
   display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px;
-  background: var(--primaria); color: var(--primaria-texto);
+  background: var(--destaque); color: var(--sobre-destaque);
 }
 .topo__marca svg { width: 22px; height: 22px; }
 
@@ -104,27 +118,32 @@ button:disabled { cursor: default; }
   min-width: var(--toque); min-height: var(--toque);
   border: 0; border-radius: var(--raio-pequeno); background: transparent; color: var(--texto-suave);
 }
-.botao-icone:active { background: var(--primaria-suave); }
+.botao-icone:active { background: var(--roxo-suave); }
 .botao-icone:disabled { opacity: .35; }
 
-/* Seletor de mês */
+/* Seletor de mês: cartão roxo */
+.seletor-mes { background: var(--roxo); border-color: transparent; color: var(--sobre-roxo); }
+.seletor-mes .botao-icone { color: var(--sobre-roxo); }
+.seletor-mes .botao-icone:active { background: rgb(255 255 255 / .15); }
 .seletor-mes__cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .seletor-mes__titulo { margin: 0; font-size: 1.2rem; }
 .seletor-mes__grade { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .seletor-mes__mes {
   min-height: var(--toque); border: 0; border-radius: var(--raio-pequeno);
-  background: var(--campo); font-weight: 600; color: var(--texto);
+  background: rgb(255 255 255 / .12); font-weight: 600; color: var(--sobre-roxo);
 }
-.seletor-mes__mes:active { background: var(--primaria-suave); }
-.seletor-mes__mes--atual { box-shadow: inset 0 0 0 2px var(--primaria); color: var(--primaria); }
+.seletor-mes__mes:active { background: rgb(255 255 255 / .25); }
+.seletor-mes__mes--atual { box-shadow: inset 0 0 0 2px var(--sobre-roxo); }
 .seletor-mes__mes--selecionado,
-.seletor-mes__mes--selecionado:active { background: var(--primaria); color: var(--primaria-texto); box-shadow: none; }
+.seletor-mes__mes--selecionado:active {
+  background: var(--destaque); color: var(--sobre-destaque); box-shadow: 0 2px 8px rgb(0 0 0 / .2); font-weight: 800;
+}
 
 /* Título do mês aberto + copiar */
 .cabecalho-mes { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 12px; }
 .cabecalho-mes__titulo { margin: 0; font-size: 1.4rem; letter-spacing: -.01em; }
 .botao-copiar {
-  border: 1.5px solid var(--borda-forte); background: var(--superficie); color: var(--primaria);
+  border: 1.5px solid var(--roxo-texto); background: var(--superficie); color: var(--roxo-texto);
 }
 
 /* Abas das quinzenas */
@@ -141,13 +160,15 @@ button:disabled { cursor: default; }
 .aba-quinzena__saldo { font-size: .85rem; }
 .aba-quinzena__saldo strong { font-variant-numeric: tabular-nums; }
 .aba-quinzena[aria-selected="true"] {
-  background: var(--superficie); color: var(--texto); box-shadow: 0 1px 4px rgb(27 35 51 / .12);
+  background: var(--roxo); color: var(--sobre-roxo-suave); box-shadow: 0 2px 6px rgb(74 35 153 / .25);
 }
-.aba-quinzena[aria-selected="true"] .aba-quinzena__titulo { color: var(--primaria); }
+.aba-quinzena[aria-selected="true"] .aba-quinzena__titulo,
+.aba-quinzena[aria-selected="true"] strong { color: var(--sobre-roxo); }
+.aba-quinzena[aria-selected="true"] .valor--negativo { color: var(--sobre-roxo-negativo); }
 
 /* Quinzena */
 .quinzena__cabecalho { display: flex; align-items: baseline; justify-content: space-between; }
-.quinzena__cabecalho h3 { margin: 0; font-size: 1.15rem; }
+.quinzena__cabecalho h3 { margin: 0; font-size: 1.15rem; color: var(--roxo-texto); }
 .quinzena__periodo { font-size: .9rem; color: var(--texto-suave); }
 
 .grupo { margin-top: 16px; }
@@ -165,8 +186,8 @@ button:disabled { cursor: default; }
   font-weight: 600; font-size: .95rem;
 }
 .botao-adicionar .icone { width: 20px; height: 20px; }
-.grupo--receita .botao-adicionar { background: var(--receita-suave); color: var(--receita); }
-.grupo--despesa .botao-adicionar { background: var(--despesa-suave); color: var(--despesa); }
+.botao-adicionar { background: var(--destaque); color: var(--sobre-destaque); font-weight: 700; }
+.botao-adicionar:active { filter: brightness(.92); }
 
 /* Linhas de lançamento */
 .lista-lancamentos { list-style: none; margin: 0; padding: 0; }
@@ -187,12 +208,12 @@ button:disabled { cursor: default; }
   background: transparent; padding: 8px; font-size: 17px;
 }
 .lancamento .campo-descricao { min-height: 36px; padding: 4px 8px; font-weight: 500; }
-.lancamento input:not([type="checkbox"]):focus { outline: none; border-color: var(--primaria); background: var(--superficie); }
+.lancamento input:not([type="checkbox"]):focus { outline: none; border-color: var(--roxo-texto); background: var(--superficie); }
 .campo-valor {
   text-align: right; font-variant-numeric: tabular-nums; font-weight: 600;
   background: var(--campo) !important; border-color: var(--borda) !important;
 }
-.campo-valor:focus { border-color: var(--primaria) !important; }
+.campo-valor:focus { border-color: var(--roxo-texto) !important; }
 .campo-valor[aria-invalid="true"] { border-color: var(--negativo) !important; }
 .lancamento__marcador { width: 32px; }
 
@@ -229,10 +250,9 @@ button:disabled { cursor: default; }
 }
 
 /* Totais */
-.resumo-mes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-.resumo-mes .total {
-  background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio);
-  padding: 12px; box-shadow: var(--sombra);
+.resumo-mes {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px;
+  padding: 14px; border-radius: var(--raio); background: var(--roxo); color: var(--sobre-roxo);
 }
 .total { display: flex; flex-direction: column; min-width: 0; }
 .total__rotulo { font-size: .82rem; color: var(--texto-suave); }
@@ -240,6 +260,9 @@ button:disabled { cursor: default; }
 [data-total$="-recebido"] { color: var(--receita); }
 [data-total$="-gasto"] { color: var(--despesa); }
 .valor--negativo { color: var(--negativo); }
+.resumo-mes .total__rotulo { color: var(--sobre-roxo-suave); }
+.resumo-mes .total__valor { color: var(--sobre-roxo); }
+.resumo-mes .valor--negativo { color: var(--sobre-roxo-negativo); }
 
 /* Painel anual */
 .big-numbers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
@@ -249,7 +272,7 @@ button:disabled { cursor: default; }
   box-shadow: var(--sombra); padding: 16px;
 }
 .numero-grande:last-child { grid-column: 1 / -1; }
-.numero-grande--destaque { grid-column: 1 / -1; background: var(--primaria); color: var(--primaria-texto); border-color: transparent; }
+.numero-grande--destaque { grid-column: 1 / -1; background: var(--roxo); color: var(--sobre-roxo); border-color: transparent; }
 .numero-grande--destaque .numero-grande__rotulo { color: inherit; opacity: .85; }
 .numero-grande__rotulo { font-size: .88rem; color: var(--texto-suave); }
 .numero-grande__valor { font-size: 1.4rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -277,28 +300,28 @@ button:disabled { cursor: default; }
   min-height: 60px; border: 0; border-radius: var(--raio); background: transparent;
   font-weight: 600; font-size: .95rem; color: var(--texto-suave);
 }
-.barra-abas button[aria-selected="true"] { background: var(--primaria-suave); color: var(--primaria); }
+.barra-abas button[aria-selected="true"] { background: var(--roxo-suave); color: var(--roxo-texto); }
 
 /* Diálogos */
 .dialogo {
   width: min(100% - 32px, 420px); border: 0; border-radius: 20px; padding: 24px;
   background: var(--superficie); color: var(--texto);
 }
-.dialogo::backdrop { background: rgb(15 20 32 / .5); }
+.dialogo::backdrop { background: rgb(30 16 64 / .55); }
 .dialogo h2 { margin: 0 0 16px; font-size: 1.25rem; }
 .dialogo label { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; font-size: .95rem; font-weight: 600; }
 .dialogo input {
   font-size: 17px; min-height: var(--toque); padding: 10px 12px; border-radius: var(--raio-pequeno);
   border: 1.5px solid var(--borda-forte); background: var(--superficie); color: var(--texto); font-weight: 400;
 }
-.dialogo input:focus { outline: none; border-color: var(--primaria); box-shadow: 0 0 0 3px var(--primaria-suave); }
+.dialogo input:focus { outline: none; border-color: var(--roxo-texto); box-shadow: 0 0 0 3px var(--roxo-suave); }
 .dialogo__erro { color: var(--negativo); min-height: 1.2em; margin: 0 0 8px; font-size: .95rem; }
 .dialogo__acoes { display: flex; gap: 10px; justify-content: flex-end; }
 .botao-primario, .botao-secundario {
   min-height: var(--toque); border-radius: var(--raio-pequeno); padding: 0 22px; font-weight: 700;
   border: 1.5px solid var(--borda-forte);
 }
-.botao-primario { background: var(--primaria); color: var(--primaria-texto); border-color: transparent; }
+.botao-primario { background: var(--destaque); color: var(--sobre-destaque); border-color: transparent; }
 .botao-secundario { background: transparent; }
 .dialogo__aviso { margin: 0 0 14px; font-size: .95rem; color: var(--texto-suave); }
 
@@ -310,7 +333,7 @@ button:disabled { cursor: default; }
   flex-direction: row; align-items: center; gap: 10px; margin: 0;
   min-height: var(--toque); padding: 4px; font-size: 1rem; font-weight: 500;
 }
-.dialogo .opcao-mes input { width: 22px; height: 22px; min-height: 0; padding: 0; accent-color: var(--primaria); }
+.dialogo .opcao-mes input { width: 22px; height: 22px; min-height: 0; padding: 0; accent-color: var(--roxo); }
 
 /* Aviso */
 .aviso {

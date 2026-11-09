@@ -27,7 +27,7 @@ crie `android/local.properties` com `sdk.dir=...`.
 
 ```bash
 npm install
-npm run apk   # gera OrcamentoQuinzenal.apk na raiz do projeto
+npm run apk   # gera OrcamentoQuinzenal-<versão>.apk na raiz do projeto
 ```
 
 O APK é de depuração (assinado com a chave de debug): serve para instalar direto no celular,

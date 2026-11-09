@@ -3,6 +3,6 @@
   "appName": "Orçamento Quinzenal",
   "webDir": "www",
   "android": {
-    "backgroundColor": "#f5f7fb"
+    "backgroundColor": "#f7f6fa"
   }
 }
