@@ -43,12 +43,15 @@ export function intervaloDaQuinzena(quinzena, ano, mes) {
     : { primeiroDia: ULTIMO_DIA_DA_PRIMEIRA_QUINZENA + 1, ultimoDia: diasNoMes(ano, mes) };
 }
 
-/** Os `quantidade` meses depois de `referencia`, atravessando o ano se preciso. */
+/** O mês `deslocamento` meses depois (ou antes, se negativo) de `referencia`, atravessando o ano se preciso. */
+export function deslocarMes(referencia, deslocamento) {
+  const primeiroDia = new Date(referencia.ano, referencia.mes + deslocamento, 1);
+  return { ano: primeiroDia.getFullYear(), mes: primeiroDia.getMonth() };
+}
+
+/** Os `quantidade` meses depois de `referencia`. */
 export function mesesSeguintes(referencia, quantidade) {
-  return Array.from({ length: quantidade }, (_, indice) => {
-    const primeiroDia = new Date(referencia.ano, referencia.mes + indice + 1, 1);
-    return { ano: primeiroDia.getFullYear(), mes: primeiroDia.getMonth() };
-  });
+  return Array.from({ length: quantidade }, (_, indice) => deslocarMes(referencia, indice + 1));
 }
 
 export function ehMesPosterior(mes, referencia) {

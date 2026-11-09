@@ -288,11 +288,48 @@ button:disabled { cursor: default; }
 }
 .lista-resumo small { color: var(--texto-suave); margin-right: 6px; }
 
+/* Contas a pagar */
+.resumo-contas {
+  display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; padding: 18px;
+  border-radius: var(--raio); background: var(--roxo); color: var(--sobre-roxo);
+}
+.resumo-contas__rotulo, .resumo-contas__detalhe { color: var(--sobre-roxo-suave); font-size: .95rem; }
+.resumo-contas__valor { font-size: 2.1rem; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.barra-progresso {
+  height: 12px; margin: 10px 0 2px; border-radius: 999px; overflow: hidden; background: rgb(255 255 255 / .2);
+}
+.barra-progresso span { display: block; height: 100%; border-radius: inherit; background: var(--destaque); }
+
+.grupo-contas h3 { display: flex; align-items: center; gap: 8px; }
+.grupo-contas__quantidade {
+  min-width: 28px; padding: 0 8px; border-radius: 999px; border: 2px solid currentColor;
+  font-size: .85rem; line-height: 22px; text-align: center;
+}
+.grupo-contas--atrasada h3 { color: var(--negativo); }
+.grupo-contas--vence-hoje { box-shadow: inset 4px 0 0 var(--destaque), var(--sombra); }
+.grupo-contas--a-vencer h3 { color: var(--roxo-texto); }
+.grupo-contas--paga h3 { color: var(--pago); }
+.grupo-contas--atrasada { box-shadow: inset 4px 0 0 var(--negativo), var(--sombra); }
+
+.lista-contas { list-style: none; margin: 0; padding: 0; }
+.conta {
+  display: grid; grid-template-columns: 32px 1fr auto; gap: 12px; align-items: center;
+  min-height: 60px; padding: 8px 0; border-top: 1px solid var(--borda);
+}
+.conta:first-child { border-top: 0; }
+.conta__texto { display: flex; flex-direction: column; min-width: 0; }
+.conta__descricao { font-weight: 600; overflow-wrap: anywhere; }
+.conta__vencimento { font-size: .88rem; color: var(--texto-suave); }
+.conta__valor { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.conta--paga .conta__descricao, .conta--paga .conta__valor {
+  text-decoration: line-through; text-decoration-thickness: 2px; color: var(--texto-suave);
+}
+
 /* Abas inferiores */
 .barra-abas {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 2;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  padding: 8px 16px calc(env(safe-area-inset-bottom) + 8px);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  padding: 8px 12px calc(env(safe-area-inset-bottom) + 8px);
   background: var(--superficie); border-top: 1px solid var(--borda);
 }
 .barra-abas button {

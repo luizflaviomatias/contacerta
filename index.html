@@ -35,6 +35,9 @@
       </div>
       <div id="quinzenas"></div>
     </section>
+    <section id="aba-contas" role="tabpanel" aria-label="Contas a pagar" hidden>
+      <div id="painel-contas"></div>
+    </section>
     <section id="aba-anual" role="tabpanel" aria-label="Visão anual" hidden>
       <div id="painel-anual"></div>
     </section>
@@ -44,6 +47,10 @@
     <button role="tab" data-aba="mes" aria-controls="aba-mes" aria-selected="true">
       <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
       <span>Mês</span>
+    </button>
+    <button role="tab" data-aba="contas" aria-controls="aba-contas" aria-selected="false">
+      <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="m9 11 2 2 4-4"/></svg>
+      <span>A pagar</span>
     </button>
     <button role="tab" data-aba="anual" aria-controls="aba-anual" aria-selected="false">
       <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 20h16"/><path d="M7 16v-5M12 16V6M17 16v-8"/></svg>
