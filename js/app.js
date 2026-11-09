@@ -19,6 +19,7 @@ import { criarPainelComparacao } from './ui/painelComparacao.js';
 import { criarPainelContasAPagar } from './ui/painelContasAPagar.js';
 import { criarSeletorDeIdioma } from './ui/seletorDeIdioma.js';
 import { criarSeletorDeMes } from './ui/seletorDeMes.js';
+import { criarTelaBoasVindas } from './ui/telaBoasVindas.js';
 
 const MESES_OFERECIDOS_NA_COPIA = 12;
 
@@ -74,6 +75,10 @@ const menuLateral = criarMenuLateral(document.getElementById('menu-lateral'), do
 const seletorDeIdioma = criarSeletorDeIdioma(document.getElementById('seletor-de-idioma'), {
   local,
   aoEscolherIdioma: (idioma) => alterarPreferencia('idioma', idioma),
+});
+const telaBoasVindas = criarTelaBoasVindas(document.getElementById('tela-boas-vindas'), {
+  local,
+  aoEscolherModo: escolherModoNaPrimeiraAbertura,
 });
 const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'), { local });
 const dialogoCopia = criarDialogoCopia(document.getElementById('dialogo-copia'), { local });
@@ -215,8 +220,14 @@ async function incluirLancamento(tipo, intervalo) {
   }
 }
 
+function escolherModoNaPrimeiraAbertura(modo) {
+  alterarPreferencia('modo', modo);
+  abrirTela('mes');
+}
+
 /** Cada tela se redesenha ao abrir, porque o mês pode ter mudado em outra. */
 const RENDERIZAR_TELA = {
+  'boas-vindas': () => telaBoasVindas.renderizar(),
   mes: renderizarMes,
   contas: renderizarContas,
   comparacao: renderizarComparacao,
@@ -230,6 +241,7 @@ function abrirTela(nome) {
     secao.hidden = secao.dataset.telaConteudo !== nome;
   }
   menuLateral.marcarTelaAtual(nome);
+  document.querySelector('.topo').classList.toggle('topo--sem-menu', nome === 'boas-vindas');
   renderizarTelaAtual();
   window.scrollTo(0, 0);
 }
@@ -240,6 +252,7 @@ function renderizarTelaAtual() {
 
 function alterarPreferencia(nome, valor) {
   aplicarPreferencias(preferencias.alterar({ [nome]: valor }));
+  if (nome === 'modo') estado.periodo = periodoDoDia(valor, hoje.getDate());
   renderizarTelaAtual();
 }
 
@@ -287,5 +300,5 @@ function registrarFuncionamentoOffline() {
 
 aplicarPreferencias(preferencias.obter());
 ouvirBotoesDeVoltar();
-abrirTela('mes');
+abrirTela(preferencias.precisaEscolherModo() ? 'boas-vindas' : 'mes');
 registrarFuncionamentoOffline();

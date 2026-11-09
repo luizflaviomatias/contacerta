@@ -65,6 +65,8 @@
 }
 
 * { box-sizing: border-box; }
+/* `hidden` sempre esconde, mesmo em elementos que definem display (grid, flex). */
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -363,6 +365,27 @@ button:disabled { cursor: default; }
 .opcao-idioma .bandeira { width: 48px; height: 32px; box-shadow: 0 0 0 1px var(--borda-forte); }
 .opcao-idioma:active { background: var(--campo); }
 .opcao-idioma[aria-current] { border-color: var(--roxo-texto); background: var(--roxo-suave); }
+
+/* Primeira abertura: mensal ou quinzenal */
+.boas-vindas { padding: 12px 0 24px; }
+.boas-vindas__saudacao { margin: 0 0 4px; color: var(--roxo-texto); font-weight: 700; }
+.boas-vindas__pergunta { margin: 0 0 20px; font-size: 1.6rem; line-height: 1.25; }
+.boas-vindas__opcoes { display: grid; gap: 14px; }
+.cartao-modo {
+  display: flex; align-items: center; gap: 16px; width: 100%; min-height: 104px; padding: 18px;
+  border: 2px solid var(--borda); border-radius: var(--raio); background: var(--superficie);
+  box-shadow: var(--sombra); text-align: left; color: var(--texto);
+}
+.cartao-modo .icone {
+  flex: none; width: 52px; height: 52px; padding: 12px; border-radius: 14px;
+  background: var(--roxo); color: var(--sobre-roxo);
+}
+.cartao-modo__texto { display: flex; flex-direction: column; gap: 4px; }
+.cartao-modo__texto strong { font-size: 1.2rem; }
+.cartao-modo__texto span { color: var(--texto-suave); }
+.cartao-modo:active { border-color: var(--roxo-texto); background: var(--roxo-suave); }
+.boas-vindas__nota { margin: 18px 4px 0; color: var(--texto-suave); font-size: .95rem; text-align: center; }
+.topo--sem-menu .botao-menu { visibility: hidden; }
 
 /* Botão do menu (hambúrguer) no topo */
 .botao-menu { color: var(--sobre-roxo); }
