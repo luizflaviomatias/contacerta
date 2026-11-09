@@ -1,5 +1,5 @@
 // Deixa o app abrir sem internet. Ao publicar uma nova versão, troque VERSAO_DO_CACHE.
-const VERSAO_DO_CACHE = 'contacerta-v1';
+const VERSAO_DO_CACHE = 'contacerta-v2';
 const ARQUIVOS_DO_APP = [
   './',
   './index.html',
