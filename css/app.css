@@ -4,6 +4,7 @@
  *  30% roxo    - topo, seletor de meses, aba ativa e resumo do mês (identidade e orientação);
  *  10% âmbar   - só o que pede ação: mês escolhido, "+ Recebimento/Gasto", Salvar/Copiar.
  * Cores de significado fixo: verde = entrou / pago, framboesa = gasto, vermelho = saldo negativo.
+ * Os temas claro e escuro usam a mesma identidade; o claro é o padrão.
  * Letras grandes, alto contraste e áreas de toque de no mínimo 48px pensando em quem tem pouca prática.
  */
 :root {
@@ -38,30 +39,29 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fundo: #14111d;
-    --superficie: #1d1929;
-    --texto: #ece8f6;
-    --texto-suave: #aaa3bf;
-    --borda: #2e2940;
-    --borda-forte: #423b58;
-    --campo: #252036;
-    --roxo: #4f2fa8;
-    --sobre-roxo: #ffffff;
-    --sobre-roxo-suave: #d3c6f5;
-    --sobre-roxo-negativo: #ffb3c0;
-    --roxo-texto: #bba5ff;
-    --roxo-suave: #2c2448;
-    --destaque: #ffb84d;
-    --sobre-destaque: #2b1a00;
-    --receita: #5bd08a;
-    --despesa: #ff7eb0;
-    --negativo: #ff7b7b;
-    --pago: #5bd08a;
-    --sombra: none;
-    color-scheme: dark;
-  }
+/* Tema escuro: só quando a pessoa escolhe (o padrão é o claro, qualquer que seja o aparelho). */
+:root[data-tema="escuro"] {
+  --fundo: #14111d;
+  --superficie: #1d1929;
+  --texto: #ece8f6;
+  --texto-suave: #aaa3bf;
+  --borda: #2e2940;
+  --borda-forte: #423b58;
+  --campo: #252036;
+  --roxo: #4f2fa8;
+  --sobre-roxo: #ffffff;
+  --sobre-roxo-suave: #d3c6f5;
+  --sobre-roxo-negativo: #ffb3c0;
+  --roxo-texto: #bba5ff;
+  --roxo-suave: #2c2448;
+  --destaque: #ffb84d;
+  --sobre-destaque: #2b1a00;
+  --receita: #5bd08a;
+  --despesa: #ff7eb0;
+  --negativo: #ff7b7b;
+  --pago: #5bd08a;
+  --sombra: none;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -325,6 +325,21 @@ button:disabled { cursor: default; }
   text-decoration: line-through; text-decoration-thickness: 2px; color: var(--texto-suave);
 }
 
+/* Preferências no menu: escolhas lado a lado */
+.preferencia { margin: 0 12px 14px; }
+.preferencia__rotulo { display: block; margin-bottom: 6px; font-weight: 600; }
+.escolhas {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px;
+  padding: 4px; border-radius: var(--raio-pequeno); background: var(--campo); border: 1px solid var(--borda);
+}
+.escolhas button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 44px; padding: 0 8px; border: 0; border-radius: 9px;
+  background: transparent; color: var(--texto-suave); font-weight: 600;
+}
+.escolhas button .icone { width: 20px; height: 20px; }
+.escolhas button[aria-pressed="true"] { background: var(--roxo); color: var(--sobre-roxo); }
+
 /* Botão do menu (hambúrguer) no topo */
 .botao-menu { margin-left: auto; color: var(--sobre-roxo); }
 .botao-menu:active { background: rgb(255 255 255 / .18); }
@@ -332,7 +347,7 @@ button:disabled { cursor: default; }
 /* Menu lateral: painel que desliza da direita */
 .menu-lateral {
   margin: 0 0 0 auto; padding: 0; border: 0;
-  width: min(340px, 88vw); max-width: none; height: 100dvh; max-height: none;
+  width: min(340px, 88vw); max-width: none; height: 100dvh; max-height: none; overflow-y: auto;
   background: var(--superficie); color: var(--texto);
   box-shadow: -8px 0 24px rgb(30 16 64 / .25);
 }

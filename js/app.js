@@ -1,5 +1,6 @@
 // Ponto de composição: cria as dependências, liga a interface às regras e guarda o estado da tela.
 import { criarAnoConformePlanilha } from './dados/modeloPlanilha.js';
+import { criarPreferencias } from './dados/preferencias.js';
 import { criarRepositorioOrcamento } from './dados/repositorioOrcamento.js';
 import { compararMeses } from './dominio/comparacaoDeMeses.js';
 import { resumirContasAPagar } from './dominio/contasAPagar.js';
@@ -29,9 +30,15 @@ const estado = {
   tela: 'mes',
 };
 
+const armazenamento = obterArmazenamentoDoAparelho();
 const repositorio = criarRepositorioOrcamento({
-  armazenamento: obterArmazenamentoDoAparelho(),
+  armazenamento,
   criarAnoInicial: (ano) => criarAnoConformePlanilha(ano, gerarId),
+});
+const preferencias = criarPreferencias({
+  armazenamento,
+  idiomasDoAparelho: navigator.languages ?? [navigator.language],
+  jaUsavaOApp: repositorio.existeAnoSalvo(hoje.getFullYear()) || repositorio.existeAnoSalvo(hoje.getFullYear() - 1),
 });
 
 const seletorDeMes = criarSeletorDeMes(document.getElementById('seletor-mes'), {
@@ -55,6 +62,7 @@ const painelComparacao = criarPainelComparacao(document.getElementById('painel-c
 });
 const menuLateral = criarMenuLateral(document.getElementById('menu-lateral'), document.getElementById('botao-menu'), {
   aoEscolherTela: abrirTela,
+  aoAlterarPreferencia: alterarPreferencia,
 });
 const painelAnual = criarPainelAnual(document.getElementById('painel-anual'), { aoTrocarAno: trocarAnoDoPainel });
 const dialogoLancamento = criarDialogoLancamento(document.getElementById('dialogo-lancamento'));
@@ -209,6 +217,15 @@ function renderizarTelaAtual() {
   RENDERIZAR_TELA[estado.tela]();
 }
 
+function alterarPreferencia(nome, valor) {
+  aplicarPreferencias(preferencias.alterar({ [nome]: valor }));
+}
+
+function aplicarPreferencias(atuais) {
+  document.documentElement.dataset.tema = atuais.tema;
+  menuLateral.marcarPreferencias(atuais);
+}
+
 /** Botões "Voltar para o mês" dentro das telas de relatório. */
 function ouvirBotoesDeVoltar() {
   document.querySelector('.conteudo').addEventListener('click', (evento) => {
@@ -240,6 +257,7 @@ function registrarFuncionamentoOffline() {
   if (!ehAppNativo && 'serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
 }
 
+aplicarPreferencias(preferencias.obter());
 ouvirBotoesDeVoltar();
 abrirTela('mes');
 registrarFuncionamentoOffline();
